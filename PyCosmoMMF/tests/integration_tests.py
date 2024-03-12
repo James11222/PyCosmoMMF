@@ -24,9 +24,9 @@ def test_calc_structure_bools():
     Rs = [np.sqrt(2)**n for n in range(5)]
     field = test_field
     sigs = PyCosmoMMF.maximum_signature(Rs, field, alg='NEXUS')
-    clusbool, filbool, wallbool, voidbool = PyCosmoMMF.calc_structure_bools(data=field, 
+    clusbool, filbool, wallbool, voidbool, S_fil, dM2_fil, S_wall, dM2_wall = PyCosmoMMF.calc_structure_bools(data=field, 
                                             max_sigs=sigs, 
-                                            verbose=False, 
+                                            verbose=True, 
                                             clusbool=None, 
                                             Smin=-3, 
                                             Smax=2, 
