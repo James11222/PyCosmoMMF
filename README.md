@@ -2,12 +2,11 @@
 
 A python version of the CosmoMMF package originally written in Julia.
 
+<p align="center">
 
-<palign="center">
+<img src="Images/CosmoMMF_Dark.png#gh-dark-mode-only" width="60%">
 
-<imgsrc="Images/CosmoMMF_Dark.png#gh-dark-mode-only"width="60%">
-
-<imgsrc="Images/CosmoMMF_light.png#gh-light-mode-only"width="60%">
+<img src="Images/CosmoMMF_light.png#gh-light-mode-only" width="60%">
 
 </p>
 
@@ -48,13 +47,14 @@ Rs = [sqrt(2)**n for n in range(10)] #smoothing scales
 max_signatures = PyCosmoMMF.maximum_signature(Rs, density_field, alg="NEXUSPLUS") #compute maximum signatures
 
 ```
+
 The output of `maximum_signature()` is a 4D Float Array where the 4th index denotes the signature type: 0 = clusters, 1 = filaments, 2 = walls. An example output of this can be seen below
 
-<palign="center">
+<p align="center">
 
-<imgsrc="Images/final_NEXUSPLUS_Signatures_hydro_dark.png#gh-dark-mode-only"width="100%">
+<img src="Images/final_NEXUSPLUS_Signatures_hydro_dark.png#gh-dark-mode-only" width="100%">
 
-<imgsrc="Images/final_NEXUSPLUS_Signatures_hydro.png#gh-light-mode-only"width="100%">
+<img src="Images/final_NEXUSPLUS_Signatures_hydro.png#gh-light-mode-only" width="100%">
 
 </p>
 
@@ -116,11 +116,11 @@ Another important optional argument in the `calc_structure_bools()` function is 
 
 The boolean filters for each structure type produced by `calc_structure_bools()` can be used to tag structures within a density field, the results of this can be seen below
 
-<palign="center">
+<p align="center">
 
-<imgsrc="Images/final_tagging_figure_dark.png#gh-dark-mode-only"width="100%">
+<img src="Images/final_tagging_figure_dark.png#gh-dark-mode-only" width="100%">
 
-<imgsrc="Images/final_tagging_figure.png#gh-light-mode-only"width="100%">
+<img src="Images/final_tagging_figure.png#gh-light-mode-only" width="100%">
 
 </p>
 
