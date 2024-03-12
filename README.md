@@ -20,6 +20,8 @@ A python version of the CosmoMMF package originally written in Julia.
 
 [![DOI](https://zenodo.org/badge/347520773.svg)](https://zenodo.org/badge/latestdoi/347520773) -->
 
+[![codecov](https://codecov.io/gh/James11222/PyCosmoMMF/graph/badge.svg?token=UCHHHXEV2D)](https://codecov.io/gh/James11222/PyCosmoMMF)
+
 Nexus Pipeline for analyzing the effects of baryonic matter on cosmological structures in IllustrisTNG simulations
 
 The `PyCosmoMMF` package contains the algorithms necessary for a Multiscale Morphological Analysis (MMF) of cosmological simulations. The purpose of this package is to streamline our modified version of the NEXUS+ algorithm. We used the `julia` version of this package in our work ([Sunseri et al. 2022](https://ui.adsabs.harvard.edu/abs/2023PhRvD.107b3514S/abstract)) to analyze the effects of baryonic matter on the Cosmic Web.
