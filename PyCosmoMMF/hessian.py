@@ -1,5 +1,5 @@
 import numpy as np
-from numba import njit
+import numba as nb
 
 def fast_hessian_from_smoothed(f_Rn, R_S, kv):
     """
@@ -25,13 +25,13 @@ def fast_hessian_from_smoothed(f_Rn, R_S, kv):
     hessian = np.zeros((dims[0], dims[1], dims[2], 6), dtype=np.complex128)
     kx, ky, kz = kv[0], kv[1], kv[2]
 
-    @njit
+    @nb.njit(parallel=True, fastmath=True)
     def perform_loop(hessian):
         """
         This function is a loop that calculates the hessian matrix
         for each point in the 3D array.
         """
-        for x in range(len(kv[0])):
+        for x in nb.prange(len(kv[0])):
             for y in range(len(kv[1])):
                 for z in range(len(kv[2])):
                     # (1,1)

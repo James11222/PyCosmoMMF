@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.measure import label
-from numba import njit
+import numba as nb
 
 
 def make_the_clusbool(data, max_sigs, verbose, Δ):
@@ -68,9 +68,9 @@ def make_the_clusbool(data, max_sigs, verbose, Δ):
     volume = np.zeros(total_clusters_detected + 1)
     signatures = np.zeros(total_clusters_detected + 1)
 
-    @njit
+    @nb.njit(parallel=True, fastmath=True)
     def perform_loop(density, volume, signatures, data, max_sigs):
-        for i in range(nx):
+        for i in nb.prange(nx):
             for j in range(ny):
                 for k in range(nz):
                     if components[i,j,k] != 0:

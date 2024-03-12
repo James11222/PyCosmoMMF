@@ -1,5 +1,5 @@
 import numpy as np
-from numba import njit
+import numba as nb
 
 from PyCosmoMMF.filter import *
 from PyCosmoMMF.hessian import *  

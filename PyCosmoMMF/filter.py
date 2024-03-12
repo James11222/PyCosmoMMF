@@ -1,5 +1,5 @@
 import numpy as np
-from numba import njit
+import numba as nb
 
 def wavevectors3D(dims, box_size=(2*np.pi, 2*np.pi, 2*np.pi)):
     """
@@ -23,7 +23,7 @@ def wavevectors3D(dims, box_size=(2*np.pi, 2*np.pi, 2*np.pi)):
     kz = np.fft.fftfreq(dims[2], 1/sample_rate[2]) * (2*np.pi / dims[2])
     return kx, ky, kz
 
-@njit
+@nb.njit(parallel=True, fastmath=True)
 def kspace_gaussian_filter(R_S, kv):
     """
     create a Gaussian filter in k-space.
@@ -43,7 +43,7 @@ def kspace_gaussian_filter(R_S, kv):
     kx, ky, kz = kv
     nx, ny, nz = len(kx), len(ky), len(kz)
     filter_k = np.zeros((nx, ny, nz))
-    for ix in range(nx):
+    for ix in nb.prange(nx):
         for iy in range(ny):
             for iz in range(nz):
                 filter_k[ix, iy, iz] = np.exp(
