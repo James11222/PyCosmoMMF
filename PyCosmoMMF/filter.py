@@ -68,20 +68,20 @@ def kspace_top_hat_filter(R_S, kv):
         The filter in k-space.
     """
 
-    kmax = (2 * np.pi) / R_S
-
     kx, ky, kz = kv
     nx, ny, nz = len(kx), len(ky), len(kz)
     filter_k = np.zeros((nx, ny, nz))
 
-    for ix in range(nx):
+    for ix in nb.prange(nx):
         for iy in range(ny):
             for iz in range(nz):
-                if (np.sqrt(kx[ix]**2 + ky[iy]**2 + kz[iz]**2)) < kmax:
-                    filter_k[ix, iy, iz] = 1
+                k = np.sqrt(kx[ix]**2 + ky[iy]**2 + kz[iz]**2)
+                if k == 0.0:
+                    filter_k[ix, iy, iz] = 1.0
+                else:
+                    filter_k[ix, iy, iz] = 3 * (np.sin(k * R_S) - (k * R_S) * np.cos(k * R_S)) / (k * R_S)**3
 
     return filter_k
-
 
 def smooth_top_hat(f, R_S, kv):
     """
