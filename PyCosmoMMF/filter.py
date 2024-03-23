@@ -50,6 +50,62 @@ def kspace_gaussian_filter(R_S, kv):
                     -(kx[ix]**2 + ky[iy]**2 + kz[iz]**2) * R_S**2 / 2)
     return filter_k
 
+@nb.njit(parallel=True, fastmath=True)
+def kspace_top_hat_filter(R_S, kv):
+    """
+    create a top-hat filter in k-space.
+
+    Parameters
+    ----------
+    R_S : float
+        The smoothing scale.
+    kv : tuple
+        The wavevectors in each dimension.
+    
+    Returns
+    -------
+    filter_k : array
+        The filter in k-space.
+    """
+
+    kmax = (2 * np.pi) / R_S
+
+    kx, ky, kz = kv
+    nx, ny, nz = len(kx), len(ky), len(kz)
+    filter_k = np.zeros((nx, ny, nz))
+
+    for ix in range(nx):
+        for iy in range(ny):
+            for iz in range(nz):
+                if (np.sqrt(kx[ix]**2 + ky[iy]**2 + kz[iz]**2)) < kmax:
+                    filter_k[ix, iy, iz] = 1
+
+    return filter_k
+
+
+def smooth_top_hat(f, R_S, kv):
+    """
+    apply a top-hat filter to a field f.
+
+    Parameters
+    ----------
+    f : array
+        The field to be smoothed.
+    R_S : float
+        The smoothing scale.
+    kv : tuple
+        The wavevectors in each dimension.
+
+    Returns
+    -------
+    f_Rn : array
+        The smoothed field.
+    """
+    GF = kspace_top_hat_filter(R_S, kv)
+    f_Rn = np.real(np.fft.ifftn(GF * np.fft.fftn(f)))
+    f_Rn = f_Rn * (np.sum(f) / np.sum(f_Rn))
+    return f_Rn
+
 def smooth_gauss(f, R_S, kv):
     """
     apply a Gaussian filter to a field f.

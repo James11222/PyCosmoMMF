@@ -19,6 +19,24 @@ def test_kspace_gaussian_filter():
     filter_k = PyCosmoMMF.kspace_gaussian_filter(R_S, (kx, ky, kz))
     assert filter_k.shape == (32, 32, 32)
 
+def test_kspace_top_hat_filter():
+    R_S = 1.0
+    dims = (32, 32, 32)
+    box_size = (2*np.pi, 2*np.pi, 2*np.pi)
+    kx, ky, kz = PyCosmoMMF.wavevectors3D(dims, box_size)
+    filter_k = PyCosmoMMF.kspace_top_hat_filter(R_S, (kx, ky, kz))
+    assert filter_k.shape == (32, 32, 32)
+
+def test_smooth_top_hat():
+    R_S = 1.0
+    dims = (32, 32, 32)
+    box_size = (2*np.pi, 2*np.pi, 2*np.pi)
+    kx, ky, kz = PyCosmoMMF.wavevectors3D(dims, box_size)
+    f = test_field
+    f_smooth = PyCosmoMMF.smooth_top_hat(f, R_S, (kx, ky, kz))
+    assert f_smooth.shape == (32, 32, 32) #correct shape
+    assert np.any(f_smooth != f) #not equal to original
+
 def test_smooth_gauss():
     R_S = 1.0
     dims = (32, 32, 32)
