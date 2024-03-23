@@ -1,4 +1,8 @@
 import numpy as np
+import os
+
+#by default we set the parallel flag to False
+# parallel_flag = False
 
 def test_print():
     """

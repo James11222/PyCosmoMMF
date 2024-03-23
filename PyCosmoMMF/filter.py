@@ -1,5 +1,13 @@
 import numpy as np
 import numba as nb
+from PyCosmoMMF.utils import *
+
+# if parallel_flag == True:
+#     jit_compiler = nb.njit(parallel=True, fastmath=True)
+# else:
+#     jit_compiler = nb.njit(fastmath=True)
+
+jit_compiler = nb.njit(fastmath=True)
 
 def wavevectors3D(dims, box_size=(2*np.pi, 2*np.pi, 2*np.pi)):
     """
@@ -23,7 +31,7 @@ def wavevectors3D(dims, box_size=(2*np.pi, 2*np.pi, 2*np.pi)):
     kz = np.fft.fftfreq(dims[2], 1/sample_rate[2]) * (2*np.pi / dims[2])
     return kx, ky, kz
 
-@nb.njit(parallel=True, fastmath=True)
+@jit_compiler
 def kspace_gaussian_filter(R_S, kv):
     """
     create a Gaussian filter in k-space.
@@ -50,7 +58,7 @@ def kspace_gaussian_filter(R_S, kv):
                     -(kx[ix]**2 + ky[iy]**2 + kz[iz]**2) * R_S**2 / 2)
     return filter_k
 
-@nb.njit(parallel=True, fastmath=True)
+@jit_compiler
 def kspace_top_hat_filter(R_S, kv):
     """
     create a top-hat filter in k-space.

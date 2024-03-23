@@ -1,5 +1,13 @@
 import numpy as np
 import numba as nb
+from PyCosmoMMF.utils import *
+
+# if parallel_flag == True:
+#     jit_compiler = nb.njit(parallel=True, fastmath=True)
+# else:
+#     jit_compiler = nb.njit(fastmath=True)
+
+jit_compiler = nb.njit(fastmath=True)
 
 def fast_hessian_from_smoothed(f_Rn, R_S, kv):
     """
@@ -25,7 +33,7 @@ def fast_hessian_from_smoothed(f_Rn, R_S, kv):
     hessian = np.zeros((dims[0], dims[1], dims[2], 6), dtype=np.complex128)
     kx, ky, kz = kv[0], kv[1], kv[2]
 
-    @nb.njit(parallel=True, fastmath=True)
+    @jit_compiler
     def perform_loop(hessian):
         """
         This function is a loop that calculates the hessian matrix

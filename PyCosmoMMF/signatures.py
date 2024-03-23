@@ -3,8 +3,16 @@ import numba as nb
 
 from PyCosmoMMF.filter import *
 from PyCosmoMMF.hessian import *
+from PyCosmoMMF.utils import *
 
-@nb.njit(parallel=True)
+# if parallel_flag == True:
+#     jit_compiler = nb.njit(parallel=True)
+# else:
+#     jit_compiler = nb.njit
+
+jit_compiler = nb.njit
+
+@jit_compiler
 def signatures_from_hessian(hessian):
     """
     Function to calculate the signatures from a given hessian.
@@ -97,7 +105,7 @@ def maximum_signature(Rs, field, alg='NEXUSPLUS'):
     # Calculate signatures at each scale Rn, determine max
     sigmax = np.ones((nx, ny, nz, 3)) * 0.00001
 
-    @nb.njit(parallel=True)
+    @jit_compiler
     def perform_loop(sigmax, sigs_Rn, nx, ny, nz):
         for ix in nb.prange(nx):
             for iy in range(ny):

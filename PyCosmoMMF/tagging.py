@@ -3,7 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage.measure import label
 import numba as nb
+from PyCosmoMMF.utils import *
 
+# if parallel_flag == True:
+#     jit_compiler = nb.njit(parallel=True, fastmath=True)
+# else:
+#     jit_compiler = nb.njit(fastmath=True)
+
+jit_compiler = nb.njit(fastmath=True)
 
 def make_the_clusbool(data, max_sigs, verbose, Δ):
     """
@@ -68,7 +75,7 @@ def make_the_clusbool(data, max_sigs, verbose, Δ):
     volume = np.zeros(total_clusters_detected + 1)
     signatures = np.zeros(total_clusters_detected + 1)
 
-    @nb.njit(parallel=True, fastmath=True)
+    @jit_compiler
     def perform_loop(density, volume, signatures, data, max_sigs):
         for i in nb.prange(nx):
             for j in range(ny):
