@@ -235,7 +235,7 @@ def calc_structure_bools(data, max_sigs, verbose, clusbool=None, Smin=-3, Smax=2
     S_fil, dM2_fil = calc_mass_change(filament_valid, flat_data_valid, Smin, Smax)
     ind = np.argmax(dM2_fil) 
     filament_thresh = S_fil[ind]
-    filbool = (max_sigs[:,:,:,2] > filament_thresh) & (~clusbool)
+    filbool = (max_sigs[:,:,:,1] > filament_thresh) & (~clusbool)
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     #                   Step 3. Create Wall Boolean Filter
