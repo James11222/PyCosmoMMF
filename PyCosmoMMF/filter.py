@@ -26,9 +26,9 @@ def wavevectors3D(dims, box_size=(2*np.pi, 2*np.pi, 2*np.pi)):
         The wavevectors in each dimension.
     """
     sample_rate = 2*np.pi * (np.array(dims) / box_size)
-    kx = np.fft.fftfreq(dims[0], 1/sample_rate[0]) * (2*np.pi / dims[0])
-    ky = np.fft.fftfreq(dims[1], 1/sample_rate[1]) * (2*np.pi / dims[1])
-    kz = np.fft.fftfreq(dims[2], 1/sample_rate[2]) * (2*np.pi / dims[2])
+    kx = (np.fft.fftfreq(dims[0], 1/sample_rate[0]) * (2*np.pi / dims[0])).astype(np.float32)
+    ky = (np.fft.fftfreq(dims[1], 1/sample_rate[1]) * (2*np.pi / dims[1])).astype(np.float32)
+    kz = (np.fft.fftfreq(dims[2], 1/sample_rate[2]) * (2*np.pi / dims[2])).astype(np.float32)
     return kx, ky, kz
 
 @jit_compiler
@@ -50,7 +50,7 @@ def kspace_gaussian_filter(R_S, kv):
     """
     kx, ky, kz = kv
     nx, ny, nz = len(kx), len(ky), len(kz)
-    filter_k = np.zeros((nx, ny, nz))
+    filter_k = np.zeros((nx, ny, nz), dtype=np.float32)
     for ix in nb.prange(nx):
         for iy in range(ny):
             for iz in range(nz):
@@ -78,7 +78,7 @@ def kspace_top_hat_filter(R_S, kv):
 
     kx, ky, kz = kv
     nx, ny, nz = len(kx), len(ky), len(kz)
-    filter_k = np.zeros((nx, ny, nz))
+    filter_k = np.zeros((nx, ny, nz), dtype=np.float32)
 
     for ix in nb.prange(nx):
         for iy in range(ny):
@@ -112,7 +112,7 @@ def smooth_top_hat(f, R_S, kv):
     GF = kspace_top_hat_filter(R_S, kv)
     f_Rn = np.real(np.fft.ifftn(GF * np.fft.fftn(f)))
     f_Rn = f_Rn * (np.sum(f) / np.sum(f_Rn))
-    return f_Rn
+    return f_Rn.astype(np.float32)
 
 def smooth_gauss(f, R_S, kv):
     """
@@ -135,7 +135,7 @@ def smooth_gauss(f, R_S, kv):
     GF = kspace_gaussian_filter(R_S, kv)
     f_Rn = np.real(np.fft.ifftn(GF * np.fft.fftn(f)))
     f_Rn = f_Rn * (np.sum(f) / np.sum(f_Rn))
-    return f_Rn
+    return f_Rn.astype(np.float32)
 
 
 def smooth_loggauss(f, R_S, kv):
@@ -178,5 +178,5 @@ def smooth_loggauss(f, R_S, kv):
     norm = np.sum(f) / np.sum(f_result)
     f_result *= norm
 
-    return f_result
+    return f_result.astype(np.float32)
 

@@ -30,7 +30,7 @@ def fast_hessian_from_smoothed(f_Rn, R_S, kv):
 
     f_Rn_hat = np.fft.fftn(f_Rn)
     dims = f_Rn_hat.shape
-    hessian = np.zeros((dims[0], dims[1], dims[2], 6), dtype=np.complex128)
+    hessian = np.zeros((dims[0], dims[1], dims[2], 6), dtype=np.complex64)
     kx, ky, kz = kv[0], kv[1], kv[2]
 
     @jit_compiler

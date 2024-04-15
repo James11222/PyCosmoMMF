@@ -29,7 +29,7 @@ def signatures_from_hessian(hessian):
     """
     
     hsize = hessian.shape[:3]
-    sigs = np.zeros((hsize[0], hsize[1], hsize[2], 3))
+    sigs = np.zeros((hsize[0], hsize[1], hsize[2], 3), dtype=np.float32)
 
     #helper functions
     def θ(x):
@@ -95,15 +95,16 @@ def maximum_signature(Rs, field, alg='NEXUSPLUS'):
         raise ValueError("alg must be either 'NEXUS' or 'NEXUSPLUS'")
     
     nx, ny, nz = field.shape
+    eps = 1e-5
     
     # Make sure the field has no 0 values
-    field = field + 0.0001
+    field = field + eps
     
     # Calculate wave vectors for our field
     wave_vecs = wavevectors3D((nx, ny, nz))
     
     # Calculate signatures at each scale Rn, determine max
-    sigmax = np.ones((nx, ny, nz, 3)) * 0.00001
+    sigmax = np.ones((nx, ny, nz, 3), dtype=np.float32) * eps
 
     @jit_compiler
     def perform_loop(sigmax, sigs_Rn, nx, ny, nz):

@@ -12,7 +12,7 @@ here = pathlib.Path(__file__).parent.resolve()
 
 setup(
     name='PyCosmoMMF',  # Required
-    version='0.0.6',  # Required
+    version='0.0.7',  # Required
     description='A package for detecting structures in the Cosmic Web.',  # Optional
     long_description=(here / 'README.md').read_text(encoding='utf-8'),  # Optional
     long_description_content_type='text/markdown',  # Optional (see note above)
