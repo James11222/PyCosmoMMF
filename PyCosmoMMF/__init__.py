@@ -10,7 +10,14 @@ import pkg_resources
 
 test_field = np.load(pkg_resources.resource_filename(__name__, 'test_density_cube.npy'))
 
-__version__ = '0.0.5'
+def version():
+    """
+    Print the version of the package.
+    """
+    __version__ = '0.0.8'
+
+    print("PyCosmoMMF version: ", __version__)
+
 
 
 

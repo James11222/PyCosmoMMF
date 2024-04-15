@@ -59,20 +59,25 @@ def signatures_from_hessian(hessian):
                 ])
                 
                 e1, e2, e3 = np.sort(np.real(np.linalg.eigvals(hes_slice)))
-            
-                sigs[i,j,k,0] = (np.abs(e3 / e1) *
-                    np.abs(e3)) * (θ(-e1) * θ(-e2) * θ(-e3))
-                
-                sigs[i,j,k,1] = (np.abs(e2 / e1) *
-                    xθ(1-np.abs(e3 / e1))) * (np.abs(e2) * θ(-e1) * θ(-e2) )
-                
-                sigs[i,j,k,2] = (xθ(1-np.abs(e2 / e1)) *
-                    xθ(1-np.abs(e3 / e1))) * (np.abs(e1) * θ(-e1))
+
+                if e1 == 0:
+                    sigs[i,j,k,0] = 0
+                    sigs[i,j,k,1] = 0
+                    sigs[i,j,k,2] = 0
+                else:
+                    sigs[i,j,k,0] = (np.abs(e3 / e1) *
+                        np.abs(e3)) * (θ(-e1) * θ(-e2) * θ(-e3))
+                    
+                    sigs[i,j,k,1] = (np.abs(e2 / e1) *
+                        xθ(1-np.abs(e3 / e1))) * (np.abs(e2) * θ(-e1) * θ(-e2) )
+                    
+                    sigs[i,j,k,2] = (xθ(1-np.abs(e2 / e1)) *
+                        xθ(1-np.abs(e3 / e1))) * (np.abs(e1) * θ(-e1))
     
     return sigs
 
 
-def maximum_signature(Rs, field, alg='NEXUSPLUS'):
+def maximum_signature(Rs, field, alg='NEXUSPLUS', eps=1e-8):
     """
     Compute the maximum signatures across all scales Rs.
 
@@ -85,6 +90,8 @@ def maximum_signature(Rs, field, alg='NEXUSPLUS'):
     alg : string, optional
         The algorithm to use. Can be either 'NEXUS' or 'NEXUSPLUS'.
         Default is 'NEXUSPLUS'.
+    eps : float, optional
+        A small number to avoid division by zero errors and whatnot. Default is 1e-8.
 
     Returns
     -------
@@ -95,7 +102,6 @@ def maximum_signature(Rs, field, alg='NEXUSPLUS'):
         raise ValueError("alg must be either 'NEXUS' or 'NEXUSPLUS'")
     
     nx, ny, nz = field.shape
-    eps = 1e-5
     
     # Make sure the field has no 0 values
     field = field + eps
