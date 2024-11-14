@@ -9,7 +9,7 @@ import skimage.measure
 jit_compiler = nb.njit(fastmath=True)
 
 
-def make_the_clusbool(delta, max_sigs, verbose, Δ):
+def make_the_clusbool(delta, max_sigs, Δ):  # pragma: no cover
     """
     make_the_clusbool() - Documentation
 
@@ -60,9 +60,7 @@ def make_the_clusbool(delta, max_sigs, verbose, Δ):
     S_th = signature_thresholds[np.abs(virialized_fractions - 0.5).argmin()]
     clusbool = max_sigs[:, :, :, 0] > S_th
 
-    if verbose:
-        return clusbool, S_th, signature_thresholds, virialized_fractions
-    return clusbool
+    return clusbool, S_th, signature_thresholds, virialized_fractions
 
 
 def calc_mass_change(sig_vec, delta_vec, Smin, Smax):
@@ -141,12 +139,13 @@ def calc_structure_bools(
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     if clusbool is None:
-        if verbose:
-            clusbool, cluster_thresh, S_clus, f_vir_clus = make_the_clusbool(
-                delta, max_sigs, verbose, Δ
-            )
-        else:
-            clusbool = make_the_clusbool(delta, max_sigs, verbose, Δ)
+        clusbool, cluster_thresh, S_clus, f_vir_clus = make_the_clusbool(
+            delta, max_sigs, Δ
+        )
+    else:
+        cluster_thresh = None
+        S_clus = None
+        f_vir_clus = None
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     #                 Step 2. Create Filament Boolean Filter
