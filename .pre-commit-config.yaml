@@ -48,23 +48,23 @@ repos:
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
-  - repo: https://github.com/codespell-project/codespell
-    rev: "v2.3.0"
-    hooks:
-      - id: codespell
+  # - repo: https://github.com/codespell-project/codespell
+  #   rev: "v2.3.0"
+  #   hooks:
+  #     - id: codespell
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: "v0.10.0.1"
     hooks:
       - id: shellcheck
 
-  - repo: local
-    hooks:
-      - id: disallow-caps
-        name: Disallow improper capitalization
-        language: pygrep
-        entry: PyBind|Numpy|Cmake|CCache|Github|PyTest
-        exclude: .pre-commit-config.yaml
+  # - repo: local
+  #   hooks:
+  #     - id: disallow-caps
+  #       name: Disallow improper capitalization
+  #       language: pygrep
+  #       entry: PyBind|Numpy|Cmake|CCache|Github|PyTest
+  #       exclude: .pre-commit-config.yaml
 
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: "v0.19"

@@ -23,7 +23,10 @@ api_tab
 
 # PyCosmoMMF
 
-PyCosmoMMF is a package for identifying structures in the Cosmic Web from a given overdensity field. 
+PyCosmoMMF is a package for identifying structures in the Cosmic Web from a
+given overdensity field.
 
 ### Authors
-James Sunseri (Princeton), Zack Li (UC Berkeley), Jia Liu (UTokyo - Kavli IPMU), Adrian Bayer (Princeton - CCA)
+
+James Sunseri (Princeton), Zack Li (UC Berkeley), Jia Liu (UTokyo - Kavli IPMU),
+Adrian Bayer (Princeton - CCA)

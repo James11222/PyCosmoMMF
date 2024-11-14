@@ -1,656 +1,1871 @@
 <!doctype html>
 <html class="no-js" lang="en" data-content_root="../">
-  <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>pycosmommf package - pycosmommf 0.1.3.dev4+gd17e420.d20241114 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
-    
-    
+    <title>
+      pycosmommf package - pycosmommf 0.1.3.dev4+gd17e420.d20241114
+      documentation
+    </title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../_static/pygments.css?v=a746c00c"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../_static/styles/furo.css?v=354aac6f"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../_static/copybutton.css?v=76b2166b"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../_static/styles/furo-extensions.css?v=302659d7"
+    />
 
-
-<style>
-  body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
-  
-  }
-  @media not print {
-    body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-    }
-    @media (prefers-color-scheme: dark) {
-      body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
+    <style>
+      body {
+        --color-code-background: #f8f8f8;
+        --color-code-foreground: black;
       }
-    }
-  }
-</style></head>
+      @media not print {
+        body[data-theme="dark"] {
+          --color-code-background: #202020;
+          --color-code-foreground: #d0d0d0;
+        }
+        @media (prefers-color-scheme: dark) {
+          body:not([data-theme="light"]) {
+            --color-code-background: #202020;
+            --color-code-foreground: #d0d0d0;
+          }
+        }
+      }
+    </style>
+  </head>
   <body>
-    
     <script>
       document.body.dataset.theme = localStorage.getItem("theme") || "auto";
     </script>
-    
 
-<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-  <symbol id="svg-toc" viewBox="0 0 24 24">
-    <title>Contents</title>
-    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
-      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+      <symbol id="svg-toc" viewBox="0 0 24 24">
+        <title>Contents</title>
+        <svg
+          stroke="currentColor"
+          fill="currentColor"
+          stroke-width="0"
+          viewBox="0 0 1024 1024"
+        >
+          <path
+            d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"
+          />
+        </svg>
+      </symbol>
+      <symbol id="svg-menu" viewBox="0 0 24 24">
+        <title>Menu</title>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather-menu"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </symbol>
+      <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+        <title>Expand</title>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather-chevron-right"
+        >
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </symbol>
+      <symbol id="svg-sun" viewBox="0 0 24 24">
+        <title>Light mode</title>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather-sun"
+        >
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </symbol>
+      <symbol id="svg-moon" viewBox="0 0 24 24">
+        <title>Dark mode</title>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon-tabler-moon"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path
+            d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"
+          />
+        </svg>
+      </symbol>
+      <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+        <title>Auto light/dark, in light mode</title>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon-custom-derived-from-feather-sun-and-tabler-moon"
+        >
+          <path
+            style="opacity: 50%"
+            d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"
+          />
+          <line x1="14.5" y1="3.25" x2="14.5" y2="1.25" />
+          <line x1="14.5" y1="15.85" x2="14.5" y2="17.85" />
+          <line x1="10.044" y1="5.094" x2="8.63" y2="3.68" />
+          <line x1="19" y1="14.05" x2="20.414" y2="15.464" />
+          <line x1="8.2" y1="9.55" x2="6.2" y2="9.55" />
+          <line x1="20.8" y1="9.55" x2="22.8" y2="9.55" />
+          <line x1="10.044" y1="14.006" x2="8.63" y2="15.42" />
+          <line x1="19" y1="5.05" x2="20.414" y2="3.636" />
+          <circle cx="14.5" cy="9.55" r="3.6" />
+        </svg>
+      </symbol>
+      <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+        <title>Auto light/dark, in dark mode</title>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon-custom-derived-from-feather-sun-and-tabler-moon"
+        >
+          <path
+            d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"
+          />
+          <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5" />
+          <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5" />
+          <line
+            style="opacity: 50%"
+            x1="15.316"
+            y1="4.816"
+            x2="14.464"
+            y2="3.964"
+          />
+          <line
+            style="opacity: 50%"
+            x1="20.711"
+            y1="10.212"
+            x2="21.563"
+            y2="11.063"
+          />
+          <line
+            style="opacity: 50%"
+            x1="14.205"
+            y1="7.5"
+            x2="13.001"
+            y2="7.5"
+          />
+          <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5" />
+          <line
+            style="opacity: 50%"
+            x1="15.316"
+            y1="10.184"
+            x2="14.464"
+            y2="11.036"
+          />
+          <line
+            style="opacity: 50%"
+            x1="20.711"
+            y1="4.789"
+            x2="21.563"
+            y2="3.937"
+          />
+          <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169" />
+        </svg>
+      </symbol>
+      <symbol id="svg-pencil" viewBox="0 0 24 24">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon-tabler-pencil-code"
+        >
+          <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+          <path d="M13.5 6.5l4 4" />
+          <path d="M20 21l2 -2l-2 -2" />
+          <path d="M17 17l-2 2l2 2" />
+        </svg>
+      </symbol>
+      <symbol id="svg-eye" viewBox="0 0 24 24">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon-tabler-eye-code"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+          <path
+            d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008"
+          />
+          <path d="M20 21l2 -2l-2 -2" />
+          <path d="M17 17l-2 2l2 2" />
+        </svg>
+      </symbol>
     </svg>
-  </symbol>
-  <symbol id="svg-menu" viewBox="0 0 24 24">
-    <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-  </symbol>
-  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
-    <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
-  </symbol>
-  <symbol id="svg-sun" viewBox="0 0 24 24">
-    <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
-      <circle cx="12" cy="12" r="5"></circle>
-      <line x1="12" y1="1" x2="12" y2="3"></line>
-      <line x1="12" y1="21" x2="12" y2="23"></line>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-      <line x1="1" y1="12" x2="3" y2="12"></line>
-      <line x1="21" y1="12" x2="23" y2="12"></line>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    </svg>
-  </symbol>
-  <symbol id="svg-moon" viewBox="0 0 24 24">
-    <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
-    </svg>
-  </symbol>
-  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
-    <title>Auto light/dark, in light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
-      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
-      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
-      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
-      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
-      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
-      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
-      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
-      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
-      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
-      <circle cx="14.5" cy="9.55" r="3.6"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
-    <title>Auto light/dark, in dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
-      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
-      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
-      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
-      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
-      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
-      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
-      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
-      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
-      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
-      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-pencil" viewBox="0 0 24 24">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
-      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-      <path d="M13.5 6.5l4 4" />
-      <path d="M20 21l2 -2l-2 -2" />
-      <path d="M17 17l-2 2l2 2" />
-    </svg>
-  </symbol>
-  <symbol id="svg-eye" viewBox="0 0 24 24">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-      <path
-        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
-      <path d="M20 21l2 -2l-2 -2" />
-      <path d="M17 17l-2 2l2 2" />
-    </svg>
-  </symbol>
-</svg>
 
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
-<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation">
-  <div class="visually-hidden">Hide navigation sidebar</div>
-</label>
-<label class="overlay toc-overlay" for="__toc">
-  <div class="visually-hidden">Hide table of contents sidebar</div>
-</label>
+    <input
+      type="checkbox"
+      class="sidebar-toggle"
+      name="__navigation"
+      id="__navigation"
+    />
+    <input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" />
+    <label class="overlay sidebar-overlay" for="__navigation">
+      <div class="visually-hidden">Hide navigation sidebar</div>
+    </label>
+    <label class="overlay toc-overlay" for="__toc">
+      <div class="visually-hidden">Hide table of contents sidebar</div>
+    </label>
 
-<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+    <a class="skip-to-content muted-link" href="#furo-main-content"
+      >Skip to content</a
+    >
 
-
-
-<div class="page">
-  <header class="mobile-header">
-    <div class="header-left">
-      <label class="nav-overlay-icon" for="__navigation">
-        <div class="visually-hidden">Toggle site navigation sidebar</div>
-        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
-      </label>
-    </div>
-    <div class="header-center">
-      <a href="../index.html"><div class="brand">pycosmommf 0.1.3.dev4+gd17e420.d20241114 documentation</div></a>
-    </div>
-    <div class="header-right">
-      <div class="theme-toggle-container theme-toggle-header">
-        <button class="theme-toggle">
-          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
-          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
-          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
-          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
-          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
-        </button>
-      </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
-        <div class="visually-hidden">Toggle table of contents sidebar</div>
-        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
-      </label>
-    </div>
-  </header>
-  <aside class="sidebar-drawer">
-    <div class="sidebar-container">
-      
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
-  
-  <div class="sidebar-logo-container">
-    <img class="sidebar-logo only-light" src="../_static/CosmoMMF_light.png" alt="Light Logo"/>
-    <img class="sidebar-logo only-dark" src="../_static/CosmoMMF_Dark.png" alt="Dark Logo"/>
-  </div>
-  
-  <span class="sidebar-brand-text">pycosmommf 0.1.3.dev4+gd17e420.d20241114 documentation</span>
-  
-</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
-  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
-  <input type="hidden" name="check_keywords" value="yes">
-  <input type="hidden" name="area" value="default">
-</form>
-<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul>
-<li class="toctree-l1"><a class="reference internal" href="../api_tab.html">API Docs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basic_usage.html">Basic Use</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basic_usage.html#general-code-usage">General Code Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api_tab.html">API Docs</a></li>
-</ul>
-
-</div>
-</div>
-
-      </div>
-      
-    </div>
-  </aside>
-  <div class="main">
-    <div class="content">
-      <div class="article-container">
-        <a href="#" class="back-to-top muted-link">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
-          </svg>
-          <span>Back to top</span>
-        </a>
-        <div class="content-icon-container">
-          <div class="view-this-page">
-  <a class="muted-link" href="../_sources/api/pycosmommf.rst.txt" title="View this page">
-    <svg><use href="#svg-eye"></use></svg>
-    <span class="visually-hidden">View this page</span>
-  </a>
-</div>
-<div class="theme-toggle-container theme-toggle-content">
-            <button class="theme-toggle">
-              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
-              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
-              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
-              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
-              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
-            </button>
-          </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
-            <div class="visually-hidden">Toggle table of contents sidebar</div>
-            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+    <div class="page">
+      <header class="mobile-header">
+        <div class="header-left">
+          <label class="nav-overlay-icon" for="__navigation">
+            <div class="visually-hidden">Toggle site navigation sidebar</div>
+            <i class="icon"
+              ><svg><use href="#svg-menu"></use></svg
+            ></i>
           </label>
         </div>
-        <article role="main" id="furo-main-content">
-          <section id="module-pycosmommf">
-<span id="pycosmommf-package"></span><h1>pycosmommf package<a class="headerlink" href="#module-pycosmommf" title="Link to this heading">¶</a></h1>
-<p>Copyright (c) 2024 James Sunseri. All rights reserved.</p>
-<p>pycosmommf: A package for identifying structures in the cosmic web.</p>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
-</section>
-<section id="module-pycosmommf.filter">
-<span id="pycosmommf-filter-module"></span><h2>pycosmommf.filter module<a class="headerlink" href="#module-pycosmommf.filter" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.filter.kspace_gaussian_filter">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.filter.</span></span><span class="sig-name descname"><span class="pre">kspace_gaussian_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R_S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.filter.kspace_gaussian_filter" title="Link to this definition">¶</a></dt>
-<dd><p>create a Gaussian filter in k-space.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>R_S</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – The smoothing scale.</p></li>
-<li><p><strong>kv</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a>) – The wavevectors in each dimension.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>filter_k</strong> – The filter in k-space.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.filter.kspace_top_hat_filter">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.filter.</span></span><span class="sig-name descname"><span class="pre">kspace_top_hat_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R_S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.filter.kspace_top_hat_filter" title="Link to this definition">¶</a></dt>
-<dd><p>create a top-hat filter in k-space.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>R_S</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – The smoothing scale.</p></li>
-<li><p><strong>kv</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a>) – The wavevectors in each dimension.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>filter_k</strong> – The filter in k-space.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.filter.smooth_gauss">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.filter.</span></span><span class="sig-name descname"><span class="pre">smooth_gauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.filter.smooth_gauss" title="Link to this definition">¶</a></dt>
-<dd><p>apply a Gaussian filter to a field f.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<em>array</em>) – The field to be smoothed.</p></li>
-<li><p><strong>R_S</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – The smoothing scale.</p></li>
-<li><p><strong>kv</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a>) – The wavevectors in each dimension.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f_Rn</strong> – The smoothed field.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.filter.smooth_loggauss">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.filter.</span></span><span class="sig-name descname"><span class="pre">smooth_loggauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.filter.smooth_loggauss" title="Link to this definition">¶</a></dt>
-<dd><p>apply a Gaussian filter to the log of a field f.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<em>array</em>) – The field to be smoothed.</p></li>
-<li><p><strong>R_S</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – The smoothing scale.</p></li>
-<li><p><strong>kv</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a>) – The wavevectors in each dimension.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f_Rn</strong> – The smoothed field.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.filter.smooth_top_hat">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.filter.</span></span><span class="sig-name descname"><span class="pre">smooth_top_hat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.filter.smooth_top_hat" title="Link to this definition">¶</a></dt>
-<dd><p>apply a top-hat filter to a field f.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<em>array</em>) – The field to be smoothed.</p></li>
-<li><p><strong>R_S</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – The smoothing scale.</p></li>
-<li><p><strong>kv</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a>) – The wavevectors in each dimension.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f_Rn</strong> – The smoothed field.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.filter.wavevectors3D">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.filter.</span></span><span class="sig-name descname"><span class="pre">wavevectors3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(6.283185307179586,</span> <span class="pre">6.283185307179586,</span> <span class="pre">6.283185307179586)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.filter.wavevectors3D" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the wavevectors for a 3D grid of dimensions <cite>dims</cite> and box size <cite>box_size</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a>) – The dimensions of the grid.</p></li>
-<li><p><strong>box_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><em>tuple</em></a>) – The size of the box in each dimension.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>kx, ky, kz</strong> – The wavevectors in each dimension.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-pycosmommf.hessian">
-<span id="pycosmommf-hessian-module"></span><h2>pycosmommf.hessian module<a class="headerlink" href="#module-pycosmommf.hessian" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.hessian.fast_hessian_from_smoothed">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.hessian.</span></span><span class="sig-name descname"><span class="pre">fast_hessian_from_smoothed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_Rn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.hessian.fast_hessian_from_smoothed" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the hessian matrix of the smoothed field f_Rn.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>f_Rn</strong> (<em>3D array</em>) – The smoothed field.</p></li>
-<li><p><strong>R_S</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – The smoothing scale.</p></li>
-<li><p><strong>kv</strong> (<em>3D array</em>) – The wavevectors.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>hessian</strong> – The hessian matrix.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>3D array</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-pycosmommf.signatures">
-<span id="pycosmommf-signatures-module"></span><h2>pycosmommf.signatures module<a class="headerlink" href="#module-pycosmommf.signatures" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.signatures.maximum_signature">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.signatures.</span></span><span class="sig-name descname"><span class="pre">maximum_signature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Rs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NEXUSPLUS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.signatures.maximum_signature" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the maximum signatures across all scales Rs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Rs</strong> (<em>array</em>) – The scales.</p></li>
-<li><p><strong>field</strong> (<em>3D array</em>) – The field.</p></li>
-<li><p><strong>alg</strong> (<em>string</em><em>, </em><em>optional</em>) – The algorithm to use. Can be either ‘NEXUS’ or ‘NEXUSPLUS’.
-Default is ‘NEXUSPLUS’.</p></li>
-<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>optional</em>) – A small number to avoid division by zero errors and whatnot. Default is 1e-8.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>sigmax</strong> – The maximum signatures.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>4D array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.signatures.signatures_from_hessian">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.signatures.</span></span><span class="sig-name descname"><span class="pre">signatures_from_hessian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hessian</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.signatures.signatures_from_hessian" title="Link to this definition">¶</a></dt>
-<dd><p>Function to calculate the signatures from a given hessian.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>hessian</strong> (<em>4D array</em>) – The hessian matrix.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>sigs</strong> – The signatures.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>4D array</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-pycosmommf.tagging">
-<span id="pycosmommf-tagging-module"></span><h2>pycosmommf.tagging module<a class="headerlink" href="#module-pycosmommf.tagging" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.tagging.calc_mass_change">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.tagging.</span></span><span class="sig-name descname"><span class="pre">calc_mass_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Smin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Smax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.tagging.calc_mass_change" title="Link to this definition">¶</a></dt>
-<dd><p>Calculate the mass change curve for a given structure type.</p>
-<section id="arguments">
-<h3>Arguments:<a class="headerlink" href="#arguments" title="Link to this heading">¶</a></h3>
-<blockquote>
-<div><p>sig_vec - [1D Float Array] - the signature values for a given structure type
-delta_vec - [1D Float Array] - the delta values for a given structure type
-Smin - [Float] - the minimum signature value
-Smax - [Float] - the maximum signature value</p>
-</div></blockquote>
-</section>
-<section id="returns">
-<h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h3>
-<dl class="simple">
-<dt>:</dt><dd><p>S - [1D Float Array] - the signature values
-ΔM_2 - [1D Float Array] - the mass change curve</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.tagging.calc_structure_bools">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.tagging.</span></span><span class="sig-name descname"><span class="pre">calc_structure_bools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sigs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusbool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Smin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Δ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">370</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.tagging.calc_structure_bools" title="Link to this definition">¶</a></dt>
-<dd><p>Calculate the boolean filters for clusters, filaments, walls, and voids.</p>
-<section id="id1">
-<h3>Arguments:<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
-<blockquote>
-<div><p>delta - [3D Float Array] - the δ delta
-max_sigs - [4D Float Array] - the maximum signatures array from CosmoMMF.maximum_signature()
-verbose - [Boolean] - a flag to allow the function to be more helpful and verbose.
-clusbool - [3D Boolean Array] - the cluster boolean filter
-Smin - [Float] - the minimum signature value
-Smax - [Float] - the maximum signature value
-Δ - [Int] - the overdensity parameter threshold for determining virialization</p>
-</div></blockquote>
-</section>
-<section id="id2">
-<h3>Returns:<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
-<dl>
-<dt>:</dt><dd><p>clusbool - [3D Boolean Array] - the cluster boolean filter
-filbool - [3D Boolean Array] - the filament boolean filter
-wallbool - [3D Boolean Array] - the wall boolean filter
-voidbool - [3D Boolean Array] - the void boolean filter</p>
-<dl class="simple">
-<dt>VERBOSE ONLY:</dt><dd><dl class="simple">
-<dt>summary_data - [Dict] - a dictionary containing the following keys:</dt><dd><p>S_clus - [1D Float Array] - the signature values for clusters
-f_vir_clus - [1D Float Array] - the virialization fraction for clusters
-S_fil - [1D Float Array] - the signature values for filaments
-dM2_fil - [1D Float Array] - the mass change curve for filaments
-S_wall - [1D Float Array] - the signature values for walls
-dM2_wall - [1D Float Array] - the mass change curve for walls</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.tagging.make_the_clusbool">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.tagging.</span></span><span class="sig-name descname"><span class="pre">make_the_clusbool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sigs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Δ</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.tagging.make_the_clusbool" title="Link to this definition">¶</a></dt>
-<dd><p>make_the_clusbool() - Documentation</p>
-<p>A function that creates a Boolean Filter which selects only
-the clusters in a given cosmological δ field. This function accomplishes
-this by finding a threshold value for 𝒮_cluster by looking at the
-change in virialization fraction as a function of 𝒮_cluster.</p>
-<p>Arguments:</p>
-<p>delta - [3D Float Array] - delta refers to the δ delta.
-max_sigs - [4D Float Array] - the maximum signatures array from CosmoMMF.maximum_signature()
-verbose - [Boolean] - a flag to allow the function to be more helpful and verbose.
-Δ - [Int] - The overdensity parameter threshold for determining virialization. This
-parameter comes from a paper by Gunn &amp; Gott on spherical collapse. Commonly
-used values that are physically motivated can be 370, 200, or 500 (for R_200 or R_500).</p>
-</dd></dl>
-
-</section>
-<section id="module-pycosmommf.utils">
-<span id="pycosmommf-utils-module"></span><h2>pycosmommf.utils module<a class="headerlink" href="#module-pycosmommf.utils" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.utils.cylinder">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.utils.</span></span><span class="sig-name descname"><span class="pre">cylinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.utils.cylinder" title="Link to this definition">¶</a></dt>
-<dd><p>Returns an nxnxn array with a cylinder in the center with
-radius r. All points within the radius are set to 1, the rest
-are set to 0.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.utils.shrink">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.utils.</span></span><span class="sig-name descname"><span class="pre">shrink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.utils.shrink" title="Link to this definition">¶</a></dt>
-<dd><p>A simple function to shrink a 3D array by summing over blocks of new_size.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.utils.sphere">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.utils.</span></span><span class="sig-name descname"><span class="pre">sphere</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.utils.sphere" title="Link to this definition">¶</a></dt>
-<dd><p>Returns an nxnxn array with a sphere in the center with
-radius r. All points within the radius are set to 1, the rest
-are set to 0.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pycosmommf.utils.wall">
-<span class="sig-prename descclassname"><span class="pre">pycosmommf.utils.</span></span><span class="sig-name descname"><span class="pre">wall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pycosmommf.utils.wall" title="Link to this definition">¶</a></dt>
-<dd><p>Builds a wall out of an nxnxn array. All values in the wall
-are set to 1. Other points are set to 0.</p>
-</dd></dl>
-
-</section>
-</section>
-
-        </article>
-      </div>
-      <footer>
-        
-        <div class="related-pages">
-          
-          
+        <div class="header-center">
+          <a href="../index.html"
+            ><div class="brand">
+              pycosmommf 0.1.3.dev4+gd17e420.d20241114 documentation
+            </div></a
+          >
         </div>
-        <div class="bottom-of-page">
-          <div class="left-details">
-            <div class="copyright">
-                Copyright &#169; 2024, James Sunseri
+        <div class="header-right">
+          <div class="theme-toggle-container theme-toggle-header">
+            <button class="theme-toggle">
+              <div class="visually-hidden">
+                Toggle Light / Dark / Auto color theme
+              </div>
+              <svg class="theme-icon-when-auto-light">
+                <use href="#svg-sun-with-moon"></use>
+              </svg>
+              <svg class="theme-icon-when-auto-dark">
+                <use href="#svg-moon-with-sun"></use>
+              </svg>
+              <svg class="theme-icon-when-dark">
+                <use href="#svg-moon"></use>
+              </svg>
+              <svg class="theme-icon-when-light">
+                <use href="#svg-sun"></use>
+              </svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-header-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"
+              ><svg><use href="#svg-toc"></use></svg
+            ></i>
+          </label>
+        </div>
+      </header>
+      <aside class="sidebar-drawer">
+        <div class="sidebar-container">
+          <div class="sidebar-sticky">
+            <a class="sidebar-brand" href="../index.html">
+              <div class="sidebar-logo-container">
+                <img
+                  class="sidebar-logo only-light"
+                  src="../_static/CosmoMMF_light.png"
+                  alt="Light Logo"
+                />
+                <img
+                  class="sidebar-logo only-dark"
+                  src="../_static/CosmoMMF_Dark.png"
+                  alt="Dark Logo"
+                />
+              </div>
+
+              <span class="sidebar-brand-text"
+                >pycosmommf 0.1.3.dev4+gd17e420.d20241114 documentation</span
+              >
+            </a>
+            <form
+              class="sidebar-search-container"
+              method="get"
+              action="../search.html"
+              role="search"
+            >
+              <input
+                class="sidebar-search"
+                placeholder="Search"
+                name="q"
+                aria-label="Search"
+              />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+            <div id="searchbox"></div>
+            <div class="sidebar-scroll">
+              <div class="sidebar-tree">
+                <ul>
+                  <li class="toctree-l1">
+                    <a class="reference internal" href="../api_tab.html"
+                      >API Docs</a
+                    >
+                  </li>
+                  <li class="toctree-l1">
+                    <a class="reference internal" href="../basic_usage.html"
+                      >Basic Use</a
+                    >
+                  </li>
+                  <li class="toctree-l1">
+                    <a
+                      class="reference internal"
+                      href="../basic_usage.html#general-code-usage"
+                      >General Code Usage</a
+                    >
+                  </li>
+                  <li class="toctree-l1">
+                    <a class="reference internal" href="../api_tab.html"
+                      >API Docs</a
+                    >
+                  </li>
+                </ul>
+              </div>
             </div>
-            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-            
-            <a href="https://github.com/pradyunsg/furo">Furo</a>
-            
-          </div>
-          <div class="right-details">
-            
           </div>
         </div>
-        
-      </footer>
-    </div>
-    <aside class="toc-drawer">
-      
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">pycosmommf package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-pycosmommf.filter">pycosmommf.filter module</a><ul>
-<li><a class="reference internal" href="#pycosmommf.filter.kspace_gaussian_filter"><code class="docutils literal notranslate"><span class="pre">kspace_gaussian_filter()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.filter.kspace_top_hat_filter"><code class="docutils literal notranslate"><span class="pre">kspace_top_hat_filter()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.filter.smooth_gauss"><code class="docutils literal notranslate"><span class="pre">smooth_gauss()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.filter.smooth_loggauss"><code class="docutils literal notranslate"><span class="pre">smooth_loggauss()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.filter.smooth_top_hat"><code class="docutils literal notranslate"><span class="pre">smooth_top_hat()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.filter.wavevectors3D"><code class="docutils literal notranslate"><span class="pre">wavevectors3D()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-pycosmommf.hessian">pycosmommf.hessian module</a><ul>
-<li><a class="reference internal" href="#pycosmommf.hessian.fast_hessian_from_smoothed"><code class="docutils literal notranslate"><span class="pre">fast_hessian_from_smoothed()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-pycosmommf.signatures">pycosmommf.signatures module</a><ul>
-<li><a class="reference internal" href="#pycosmommf.signatures.maximum_signature"><code class="docutils literal notranslate"><span class="pre">maximum_signature()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.signatures.signatures_from_hessian"><code class="docutils literal notranslate"><span class="pre">signatures_from_hessian()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-pycosmommf.tagging">pycosmommf.tagging module</a><ul>
-<li><a class="reference internal" href="#pycosmommf.tagging.calc_mass_change"><code class="docutils literal notranslate"><span class="pre">calc_mass_change()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.tagging.calc_structure_bools"><code class="docutils literal notranslate"><span class="pre">calc_structure_bools()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.tagging.make_the_clusbool"><code class="docutils literal notranslate"><span class="pre">make_the_clusbool()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-pycosmommf.utils">pycosmommf.utils module</a><ul>
-<li><a class="reference internal" href="#pycosmommf.utils.cylinder"><code class="docutils literal notranslate"><span class="pre">cylinder()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.utils.shrink"><code class="docutils literal notranslate"><span class="pre">shrink()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.utils.sphere"><code class="docutils literal notranslate"><span class="pre">sphere()</span></code></a></li>
-<li><a class="reference internal" href="#pycosmommf.utils.wall"><code class="docutils literal notranslate"><span class="pre">wall()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+      </aside>
+      <div class="main">
+        <div class="content">
+          <div class="article-container">
+            <a href="#" class="back-to-top muted-link">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"
+                ></path>
+              </svg>
+              <span>Back to top</span>
+            </a>
+            <div class="content-icon-container">
+              <div class="view-this-page">
+                <a
+                  class="muted-link"
+                  href="../_sources/api/pycosmommf.rst.txt"
+                  title="View this page"
+                >
+                  <svg><use href="#svg-eye"></use></svg>
+                  <span class="visually-hidden">View this page</span>
+                </a>
+              </div>
+              <div class="theme-toggle-container theme-toggle-content">
+                <button class="theme-toggle">
+                  <div class="visually-hidden">
+                    Toggle Light / Dark / Auto color theme
+                  </div>
+                  <svg class="theme-icon-when-auto-light">
+                    <use href="#svg-sun-with-moon"></use>
+                  </svg>
+                  <svg class="theme-icon-when-auto-dark">
+                    <use href="#svg-moon-with-sun"></use>
+                  </svg>
+                  <svg class="theme-icon-when-dark">
+                    <use href="#svg-moon"></use>
+                  </svg>
+                  <svg class="theme-icon-when-light">
+                    <use href="#svg-sun"></use>
+                  </svg>
+                </button>
+              </div>
+              <label class="toc-overlay-icon toc-content-icon" for="__toc">
+                <div class="visually-hidden">
+                  Toggle table of contents sidebar
+                </div>
+                <i class="icon"
+                  ><svg><use href="#svg-toc"></use></svg
+                ></i>
+              </label>
+            </div>
+            <article role="main" id="furo-main-content">
+              <section id="module-pycosmommf">
+                <span id="pycosmommf-package"></span>
+                <h1>
+                  pycosmommf package<a
+                    class="headerlink"
+                    href="#module-pycosmommf"
+                    title="Link to this heading"
+                    >¶</a
+                  >
+                </h1>
+                <p>Copyright (c) 2024 James Sunseri. All rights reserved.</p>
+                <p>
+                  pycosmommf: A package for identifying structures in the cosmic
+                  web.
+                </p>
+                <section id="submodules">
+                  <h2>
+                    Submodules<a
+                      class="headerlink"
+                      href="#submodules"
+                      title="Link to this heading"
+                      >¶</a
+                    >
+                  </h2>
+                </section>
+                <section id="module-pycosmommf.filter">
+                  <span id="pycosmommf-filter-module"></span>
+                  <h2>
+                    pycosmommf.filter module<a
+                      class="headerlink"
+                      href="#module-pycosmommf.filter"
+                      title="Link to this heading"
+                      >¶</a
+                    >
+                  </h2>
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.filter.kspace_gaussian_filter"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.filter.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">kspace_gaussian_filter</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"><span class="pre">R_S</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">kv</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.filter.kspace_gaussian_filter"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>create a Gaussian filter in k-space.</p>
+                      <dl class="field-list simple">
+                        <dt class="field-odd">
+                          Parameters<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <ul class="simple">
+                            <li>
+                              <p>
+                                <strong>R_S</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/functions.html#float"
+                                  title="(in Python v3.13)"
+                                  ><em>float</em></a
+                                >) – The smoothing scale.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>kv</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/stdtypes.html#tuple"
+                                  title="(in Python v3.13)"
+                                  ><em>tuple</em></a
+                                >) – The wavevectors in each dimension.
+                              </p>
+                            </li>
+                          </ul>
+                        </dd>
+                        <dt class="field-even">
+                          Returns<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-even">
+                          <p>
+                            <strong>filter_k</strong> – The filter in k-space.
+                          </p>
+                        </dd>
+                        <dt class="field-odd">
+                          Return type<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd"><p>array</p></dd>
+                      </dl>
+                    </dd>
+                  </dl>
 
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.filter.kspace_top_hat_filter"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.filter.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">kspace_top_hat_filter</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"><span class="pre">R_S</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">kv</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.filter.kspace_top_hat_filter"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>create a top-hat filter in k-space.</p>
+                      <dl class="field-list simple">
+                        <dt class="field-odd">
+                          Parameters<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <ul class="simple">
+                            <li>
+                              <p>
+                                <strong>R_S</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/functions.html#float"
+                                  title="(in Python v3.13)"
+                                  ><em>float</em></a
+                                >) – The smoothing scale.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>kv</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/stdtypes.html#tuple"
+                                  title="(in Python v3.13)"
+                                  ><em>tuple</em></a
+                                >) – The wavevectors in each dimension.
+                              </p>
+                            </li>
+                          </ul>
+                        </dd>
+                        <dt class="field-even">
+                          Returns<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-even">
+                          <p>
+                            <strong>filter_k</strong> – The filter in k-space.
+                          </p>
+                        </dd>
+                        <dt class="field-odd">
+                          Return type<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd"><p>array</p></dd>
+                      </dl>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.filter.smooth_gauss"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.filter.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">smooth_gauss</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"><span class="pre">f</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">R_S</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">kv</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.filter.smooth_gauss"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>apply a Gaussian filter to a field f.</p>
+                      <dl class="field-list simple">
+                        <dt class="field-odd">
+                          Parameters<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <ul class="simple">
+                            <li>
+                              <p>
+                                <strong>f</strong> (<em>array</em>) – The field
+                                to be smoothed.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>R_S</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/functions.html#float"
+                                  title="(in Python v3.13)"
+                                  ><em>float</em></a
+                                >) – The smoothing scale.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>kv</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/stdtypes.html#tuple"
+                                  title="(in Python v3.13)"
+                                  ><em>tuple</em></a
+                                >) – The wavevectors in each dimension.
+                              </p>
+                            </li>
+                          </ul>
+                        </dd>
+                        <dt class="field-even">
+                          Returns<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-even">
+                          <p><strong>f_Rn</strong> – The smoothed field.</p>
+                        </dd>
+                        <dt class="field-odd">
+                          Return type<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd"><p>array</p></dd>
+                      </dl>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.filter.smooth_loggauss"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.filter.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">smooth_loggauss</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"><span class="pre">f</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">R_S</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">kv</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.filter.smooth_loggauss"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>apply a Gaussian filter to the log of a field f.</p>
+                      <dl class="field-list simple">
+                        <dt class="field-odd">
+                          Parameters<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <ul class="simple">
+                            <li>
+                              <p>
+                                <strong>f</strong> (<em>array</em>) – The field
+                                to be smoothed.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>R_S</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/functions.html#float"
+                                  title="(in Python v3.13)"
+                                  ><em>float</em></a
+                                >) – The smoothing scale.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>kv</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/stdtypes.html#tuple"
+                                  title="(in Python v3.13)"
+                                  ><em>tuple</em></a
+                                >) – The wavevectors in each dimension.
+                              </p>
+                            </li>
+                          </ul>
+                        </dd>
+                        <dt class="field-even">
+                          Returns<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-even">
+                          <p><strong>f_Rn</strong> – The smoothed field.</p>
+                        </dd>
+                        <dt class="field-odd">
+                          Return type<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd"><p>array</p></dd>
+                      </dl>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.filter.smooth_top_hat"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.filter.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">smooth_top_hat</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"><span class="pre">f</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">R_S</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">kv</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.filter.smooth_top_hat"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>apply a top-hat filter to a field f.</p>
+                      <dl class="field-list simple">
+                        <dt class="field-odd">
+                          Parameters<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <ul class="simple">
+                            <li>
+                              <p>
+                                <strong>f</strong> (<em>array</em>) – The field
+                                to be smoothed.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>R_S</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/functions.html#float"
+                                  title="(in Python v3.13)"
+                                  ><em>float</em></a
+                                >) – The smoothing scale.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>kv</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/stdtypes.html#tuple"
+                                  title="(in Python v3.13)"
+                                  ><em>tuple</em></a
+                                >) – The wavevectors in each dimension.
+                              </p>
+                            </li>
+                          </ul>
+                        </dd>
+                        <dt class="field-even">
+                          Returns<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-even">
+                          <p><strong>f_Rn</strong> – The smoothed field.</p>
+                        </dd>
+                        <dt class="field-odd">
+                          Return type<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd"><p>array</p></dd>
+                      </dl>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.filter.wavevectors3D"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.filter.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">wavevectors3D</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">dims</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">box_size</span></span
+                        ><span class="o"><span class="pre">=</span></span
+                        ><span class="default_value"
+                          ><span class="pre">(6.283185307179586,</span>
+                          <span class="pre">6.283185307179586,</span>
+                          <span class="pre">6.283185307179586)</span></span
+                        ></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.filter.wavevectors3D"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        Returns the wavevectors for a 3D grid of dimensions
+                        <cite>dims</cite> and box size <cite>box_size</cite>.
+                      </p>
+                      <dl class="field-list simple">
+                        <dt class="field-odd">
+                          Parameters<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <ul class="simple">
+                            <li>
+                              <p>
+                                <strong>dims</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/stdtypes.html#tuple"
+                                  title="(in Python v3.13)"
+                                  ><em>tuple</em></a
+                                >) – The dimensions of the grid.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>box_size</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/stdtypes.html#tuple"
+                                  title="(in Python v3.13)"
+                                  ><em>tuple</em></a
+                                >) – The size of the box in each dimension.
+                              </p>
+                            </li>
+                          </ul>
+                        </dd>
+                        <dt class="field-even">
+                          Returns<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-even">
+                          <p>
+                            <strong>kx, ky, kz</strong> – The wavevectors in
+                            each dimension.
+                          </p>
+                        </dd>
+                        <dt class="field-odd">
+                          Return type<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <p>
+                            <a
+                              class="reference external"
+                              href="https://docs.python.org/3/library/stdtypes.html#tuple"
+                              title="(in Python v3.13)"
+                              >tuple</a
+                            >
+                          </p>
+                        </dd>
+                      </dl>
+                    </dd>
+                  </dl>
+                </section>
+                <section id="module-pycosmommf.hessian">
+                  <span id="pycosmommf-hessian-module"></span>
+                  <h2>
+                    pycosmommf.hessian module<a
+                      class="headerlink"
+                      href="#module-pycosmommf.hessian"
+                      title="Link to this heading"
+                      >¶</a
+                    >
+                  </h2>
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.hessian.fast_hessian_from_smoothed"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.hessian.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre"
+                          >fast_hessian_from_smoothed</span
+                        ></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">f_Rn</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">R_S</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">kv</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.hessian.fast_hessian_from_smoothed"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        Compute the hessian matrix of the smoothed field f_Rn.
+                      </p>
+                      <dl class="field-list simple">
+                        <dt class="field-odd">
+                          Parameters<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <ul class="simple">
+                            <li>
+                              <p>
+                                <strong>f_Rn</strong> (<em>3D array</em>) – The
+                                smoothed field.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>R_S</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/functions.html#float"
+                                  title="(in Python v3.13)"
+                                  ><em>float</em></a
+                                >) – The smoothing scale.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>kv</strong> (<em>3D array</em>) – The
+                                wavevectors.
+                              </p>
+                            </li>
+                          </ul>
+                        </dd>
+                        <dt class="field-even">
+                          Returns<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-even">
+                          <p><strong>hessian</strong> – The hessian matrix.</p>
+                        </dd>
+                        <dt class="field-odd">
+                          Return type<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd"><p>3D array</p></dd>
+                      </dl>
+                    </dd>
+                  </dl>
+                </section>
+                <section id="module-pycosmommf.signatures">
+                  <span id="pycosmommf-signatures-module"></span>
+                  <h2>
+                    pycosmommf.signatures module<a
+                      class="headerlink"
+                      href="#module-pycosmommf.signatures"
+                      title="Link to this heading"
+                      >¶</a
+                    >
+                  </h2>
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.signatures.maximum_signature"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.signatures.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">maximum_signature</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"><span class="pre">Rs</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">field</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">alg</span></span
+                        ><span class="o"><span class="pre">=</span></span
+                        ><span class="default_value"
+                          ><span class="pre">'NEXUSPLUS'</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">eps</span></span
+                        ><span class="o"><span class="pre">=</span></span
+                        ><span class="default_value"
+                          ><span class="pre">1e-08</span></span
+                        ></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.signatures.maximum_signature"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        Compute the maximum signatures across all scales Rs.
+                      </p>
+                      <dl class="field-list simple">
+                        <dt class="field-odd">
+                          Parameters<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <ul class="simple">
+                            <li>
+                              <p>
+                                <strong>Rs</strong> (<em>array</em>) – The
+                                scales.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>field</strong> (<em>3D array</em>) – The
+                                field.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>alg</strong> (<em>string</em><em>, </em
+                                ><em>optional</em>) – The algorithm to use. Can
+                                be either ‘NEXUS’ or ‘NEXUSPLUS’. Default is
+                                ‘NEXUSPLUS’.
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>eps</strong> (<a
+                                  class="reference external"
+                                  href="https://docs.python.org/3/library/functions.html#float"
+                                  title="(in Python v3.13)"
+                                  ><em>float</em></a
+                                ><em>, </em><em>optional</em>) – A small number
+                                to avoid division by zero errors and whatnot.
+                                Default is 1e-8.
+                              </p>
+                            </li>
+                          </ul>
+                        </dd>
+                        <dt class="field-even">
+                          Returns<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-even">
+                          <p>
+                            <strong>sigmax</strong> – The maximum signatures.
+                          </p>
+                        </dd>
+                        <dt class="field-odd">
+                          Return type<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd"><p>4D array</p></dd>
+                      </dl>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.signatures.signatures_from_hessian"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.signatures.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">signatures_from_hessian</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">hessian</span></span
+                        ></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.signatures.signatures_from_hessian"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        Function to calculate the signatures from a given
+                        hessian.
+                      </p>
+                      <dl class="field-list simple">
+                        <dt class="field-odd">
+                          Parameters<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd">
+                          <p>
+                            <strong>hessian</strong> (<em>4D array</em>) – The
+                            hessian matrix.
+                          </p>
+                        </dd>
+                        <dt class="field-even">
+                          Returns<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-even">
+                          <p><strong>sigs</strong> – The signatures.</p>
+                        </dd>
+                        <dt class="field-odd">
+                          Return type<span class="colon">:</span>
+                        </dt>
+                        <dd class="field-odd"><p>4D array</p></dd>
+                      </dl>
+                    </dd>
+                  </dl>
+                </section>
+                <section id="module-pycosmommf.tagging">
+                  <span id="pycosmommf-tagging-module"></span>
+                  <h2>
+                    pycosmommf.tagging module<a
+                      class="headerlink"
+                      href="#module-pycosmommf.tagging"
+                      title="Link to this heading"
+                      >¶</a
+                    >
+                  </h2>
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.tagging.calc_mass_change"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.tagging.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">calc_mass_change</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">sig_vec</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">delta_vec</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">Smin</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">Smax</span></span
+                        ></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.tagging.calc_mass_change"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        Calculate the mass change curve for a given structure
+                        type.
+                      </p>
+                      <section id="arguments">
+                        <h3>
+                          Arguments:<a
+                            class="headerlink"
+                            href="#arguments"
+                            title="Link to this heading"
+                            >¶</a
+                          >
+                        </h3>
+                        <blockquote>
+                          <div>
+                            <p>
+                              sig_vec - [1D Float Array] - the signature values
+                              for a given structure type delta_vec - [1D Float
+                              Array] - the delta values for a given structure
+                              type Smin - [Float] - the minimum signature value
+                              Smax - [Float] - the maximum signature value
+                            </p>
+                          </div>
+                        </blockquote>
+                      </section>
+                      <section id="returns">
+                        <h3>
+                          Returns:<a
+                            class="headerlink"
+                            href="#returns"
+                            title="Link to this heading"
+                            >¶</a
+                          >
+                        </h3>
+                        <dl class="simple">
+                          <dt>:</dt>
+                          <dd>
+                            <p>
+                              S - [1D Float Array] - the signature values ΔM_2 -
+                              [1D Float Array] - the mass change curve
+                            </p>
+                          </dd>
+                        </dl>
+                      </section>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.tagging.calc_structure_bools"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.tagging.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">calc_structure_bools</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">delta</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">max_sigs</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">verbose</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">clusbool</span></span
+                        ><span class="o"><span class="pre">=</span></span
+                        ><span class="default_value"
+                          ><span class="pre">None</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">Smin</span></span
+                        ><span class="o"><span class="pre">=</span></span
+                        ><span class="default_value"
+                          ><span class="pre">-3</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">Smax</span></span
+                        ><span class="o"><span class="pre">=</span></span
+                        ><span class="default_value"
+                          ><span class="pre">2</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">Δ</span></span
+                        ><span class="o"><span class="pre">=</span></span
+                        ><span class="default_value"
+                          ><span class="pre">370</span></span
+                        ></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.tagging.calc_structure_bools"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        Calculate the boolean filters for clusters, filaments,
+                        walls, and voids.
+                      </p>
+                      <section id="id1">
+                        <h3>
+                          Arguments:<a
+                            class="headerlink"
+                            href="#id1"
+                            title="Link to this heading"
+                            >¶</a
+                          >
+                        </h3>
+                        <blockquote>
+                          <div>
+                            <p>
+                              delta - [3D Float Array] - the δ delta max_sigs -
+                              [4D Float Array] - the maximum signatures array
+                              from CosmoMMF.maximum_signature() verbose -
+                              [Boolean] - a flag to allow the function to be
+                              more helpful and verbose. clusbool - [3D Boolean
+                              Array] - the cluster boolean filter Smin - [Float]
+                              - the minimum signature value Smax - [Float] - the
+                              maximum signature value Δ - [Int] - the
+                              overdensity parameter threshold for determining
+                              virialization
+                            </p>
+                          </div>
+                        </blockquote>
+                      </section>
+                      <section id="id2">
+                        <h3>
+                          Returns:<a
+                            class="headerlink"
+                            href="#id2"
+                            title="Link to this heading"
+                            >¶</a
+                          >
+                        </h3>
+                        <dl>
+                          <dt>:</dt>
+                          <dd>
+                            <p>
+                              clusbool - [3D Boolean Array] - the cluster
+                              boolean filter filbool - [3D Boolean Array] - the
+                              filament boolean filter wallbool - [3D Boolean
+                              Array] - the wall boolean filter voidbool - [3D
+                              Boolean Array] - the void boolean filter
+                            </p>
+                            <dl class="simple">
+                              <dt>VERBOSE ONLY:</dt>
+                              <dd>
+                                <dl class="simple">
+                                  <dt>
+                                    summary_data - [Dict] - a dictionary
+                                    containing the following keys:
+                                  </dt>
+                                  <dd>
+                                    <p>
+                                      S_clus - [1D Float Array] - the signature
+                                      values for clusters f_vir_clus - [1D Float
+                                      Array] - the virialization fraction for
+                                      clusters S_fil - [1D Float Array] - the
+                                      signature values for filaments dM2_fil -
+                                      [1D Float Array] - the mass change curve
+                                      for filaments S_wall - [1D Float Array] -
+                                      the signature values for walls dM2_wall -
+                                      [1D Float Array] - the mass change curve
+                                      for walls
+                                    </p>
+                                  </dd>
+                                </dl>
+                              </dd>
+                            </dl>
+                          </dd>
+                        </dl>
+                      </section>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.tagging.make_the_clusbool"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.tagging.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">make_the_clusbool</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">delta</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">max_sigs</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">Δ</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.tagging.make_the_clusbool"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>make_the_clusbool() - Documentation</p>
+                      <p>
+                        A function that creates a Boolean Filter which selects
+                        only the clusters in a given cosmological δ field. This
+                        function accomplishes this by finding a threshold value
+                        for 𝒮_cluster by looking at the change in virialization
+                        fraction as a function of 𝒮_cluster.
+                      </p>
+                      <p>Arguments:</p>
+                      <p>
+                        delta - [3D Float Array] - delta refers to the δ delta.
+                        max_sigs - [4D Float Array] - the maximum signatures
+                        array from CosmoMMF.maximum_signature() verbose -
+                        [Boolean] - a flag to allow the function to be more
+                        helpful and verbose. Δ - [Int] - The overdensity
+                        parameter threshold for determining virialization. This
+                        parameter comes from a paper by Gunn &amp; Gott on
+                        spherical collapse. Commonly used values that are
+                        physically motivated can be 370, 200, or 500 (for R_200
+                        or R_500).
+                      </p>
+                    </dd>
+                  </dl>
+                </section>
+                <section id="module-pycosmommf.utils">
+                  <span id="pycosmommf-utils-module"></span>
+                  <h2>
+                    pycosmommf.utils module<a
+                      class="headerlink"
+                      href="#module-pycosmommf.utils"
+                      title="Link to this heading"
+                      >¶</a
+                    >
+                  </h2>
+                  <dl class="py function">
+                    <dt
+                      class="sig sig-object py"
+                      id="pycosmommf.utils.cylinder"
+                    >
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.utils.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">cylinder</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"><span class="pre">n</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">r</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.utils.cylinder"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        Returns an nxnxn array with a cylinder in the center
+                        with radius r. All points within the radius are set to
+                        1, the rest are set to 0.
+                      </p>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt class="sig sig-object py" id="pycosmommf.utils.shrink">
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.utils.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">shrink</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">data</span></span
+                        ></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"
+                          ><span class="pre">new_size</span></span
+                        ></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.utils.shrink"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        A simple function to shrink a 3D array by summing over
+                        blocks of new_size.
+                      </p>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt class="sig sig-object py" id="pycosmommf.utils.sphere">
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.utils.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">sphere</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"><span class="pre">n</span></span></em
+                      >,
+                      <em class="sig-param"
+                        ><span class="n"><span class="pre">r</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.utils.sphere"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        Returns an nxnxn array with a sphere in the center with
+                        radius r. All points within the radius are set to 1, the
+                        rest are set to 0.
+                      </p>
+                    </dd>
+                  </dl>
+
+                  <dl class="py function">
+                    <dt class="sig sig-object py" id="pycosmommf.utils.wall">
+                      <span class="sig-prename descclassname"
+                        ><span class="pre">pycosmommf.utils.</span></span
+                      ><span class="sig-name descname"
+                        ><span class="pre">wall</span></span
+                      ><span class="sig-paren">(</span
+                      ><em class="sig-param"
+                        ><span class="n"><span class="pre">n</span></span></em
+                      ><span class="sig-paren">)</span
+                      ><a
+                        class="headerlink"
+                        href="#pycosmommf.utils.wall"
+                        title="Link to this definition"
+                        >¶</a
+                      >
+                    </dt>
+                    <dd>
+                      <p>
+                        Builds a wall out of an nxnxn array. All values in the
+                        wall are set to 1. Other points are set to 0.
+                      </p>
+                    </dd>
+                  </dl>
+                </section>
+              </section>
+            </article>
           </div>
+          <footer>
+            <div class="related-pages"></div>
+            <div class="bottom-of-page">
+              <div class="left-details">
+                <div class="copyright">
+                  Copyright &#169; 2024, James Sunseri
+                </div>
+                Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+                <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a
+                >'s
+
+                <a href="https://github.com/pradyunsg/furo">Furo</a>
+              </div>
+              <div class="right-details"></div>
+            </div>
+          </footer>
         </div>
+        <aside class="toc-drawer">
+          <div class="toc-sticky toc-scroll">
+            <div class="toc-title-container">
+              <span class="toc-title"> On this page </span>
+            </div>
+            <div class="toc-tree-container">
+              <div class="toc-tree">
+                <ul>
+                  <li>
+                    <a class="reference internal" href="#"
+                      >pycosmommf package</a
+                    >
+                    <ul>
+                      <li>
+                        <a class="reference internal" href="#submodules"
+                          >Submodules</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="reference internal"
+                          href="#module-pycosmommf.filter"
+                          >pycosmommf.filter module</a
+                        >
+                        <ul>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.filter.kspace_gaussian_filter"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre"
+                                  >kspace_gaussian_filter()</span
+                                ></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.filter.kspace_top_hat_filter"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre"
+                                  >kspace_top_hat_filter()</span
+                                ></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.filter.smooth_gauss"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre">smooth_gauss()</span></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.filter.smooth_loggauss"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre"
+                                  >smooth_loggauss()</span
+                                ></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.filter.smooth_top_hat"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre">smooth_top_hat()</span></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.filter.wavevectors3D"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre">wavevectors3D()</span></code
+                              ></a
+                            >
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a
+                          class="reference internal"
+                          href="#module-pycosmommf.hessian"
+                          >pycosmommf.hessian module</a
+                        >
+                        <ul>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.hessian.fast_hessian_from_smoothed"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre"
+                                  >fast_hessian_from_smoothed()</span
+                                ></code
+                              ></a
+                            >
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a
+                          class="reference internal"
+                          href="#module-pycosmommf.signatures"
+                          >pycosmommf.signatures module</a
+                        >
+                        <ul>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.signatures.maximum_signature"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre"
+                                  >maximum_signature()</span
+                                ></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.signatures.signatures_from_hessian"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre"
+                                  >signatures_from_hessian()</span
+                                ></code
+                              ></a
+                            >
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a
+                          class="reference internal"
+                          href="#module-pycosmommf.tagging"
+                          >pycosmommf.tagging module</a
+                        >
+                        <ul>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.tagging.calc_mass_change"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre"
+                                  >calc_mass_change()</span
+                                ></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.tagging.calc_structure_bools"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre"
+                                  >calc_structure_bools()</span
+                                ></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.tagging.make_the_clusbool"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre"
+                                  >make_the_clusbool()</span
+                                ></code
+                              ></a
+                            >
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a
+                          class="reference internal"
+                          href="#module-pycosmommf.utils"
+                          >pycosmommf.utils module</a
+                        >
+                        <ul>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.utils.cylinder"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre">cylinder()</span></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.utils.shrink"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre">shrink()</span></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.utils.sphere"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre">sphere()</span></code
+                              ></a
+                            >
+                          </li>
+                          <li>
+                            <a
+                              class="reference internal"
+                              href="#pycosmommf.utils.wall"
+                              ><code class="docutils literal notranslate"
+                                ><span class="pre">wall()</span></code
+                              ></a
+                            >
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
-      
-      
-    </aside>
-  </div>
-</div><script src="../_static/documentation_options.js?v=27e77f62"></script>
+    </div>
+    <script src="../_static/documentation_options.js?v=27e77f62"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
-    </body>
+  </body>
 </html>
