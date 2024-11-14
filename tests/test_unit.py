@@ -4,12 +4,12 @@ import numpy as np
 
 import pycosmommf as m
 
-test_field = (np.roll(m.sphere(32, 5), -10, axis=0) 
-              +
-              np.roll(m.sphere(32, 5), 10, axis=0) 
-              + 
-              m.cylinder(32, 5)
+test_field = (
+    np.roll(m.sphere(32, 5), -10, axis=0)
+    + np.roll(m.sphere(32, 5), 10, axis=0)
+    + m.cylinder(32, 5)
 )
+
 
 def test_wavevectors3D():
     dims = (32, 32, 32)
