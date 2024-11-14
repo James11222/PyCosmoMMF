@@ -11,7 +11,7 @@ authors = [
 description = "A package for identifying structures in the cosmic web."
 readme = "README.md"
 license.file = "LICENSE"
-requires-python = ">=3.8"
+requires-python = ">=3.8, <3.13"
 classifiers = [
   "Development Status :: 1 - Planning",
   "Intended Audience :: Science/Research",
