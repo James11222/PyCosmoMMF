@@ -36,7 +36,7 @@ def wavevectors3D(dims, box_size=(2 * np.pi, 2 * np.pi, 2 * np.pi)):
 
 
 @jit_compiler
-def kspace_gaussian_filter(R_S, kv): # pragma: no cover
+def kspace_gaussian_filter(R_S, kv):  # pragma: no cover
     """
     create a Gaussian filter in k-space.
 
@@ -65,7 +65,7 @@ def kspace_gaussian_filter(R_S, kv): # pragma: no cover
 
 
 @jit_compiler
-def kspace_top_hat_filter(R_S, kv): # pragma: no cover
+def kspace_top_hat_filter(R_S, kv):  # pragma: no cover
     """
     create a top-hat filter in k-space.
 

@@ -31,7 +31,7 @@ def fast_hessian_from_smoothed(f_Rn, R_S, kv):
     kx, ky, kz = kv[0], kv[1], kv[2]
 
     @jit_compiler
-    def perform_loop(hessian): # pragma: no cover
+    def perform_loop(hessian):  # pragma: no cover
         """
         This function is a loop that calculates the hessian matrix
         for each point in the 3D array.
