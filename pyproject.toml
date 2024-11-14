@@ -33,7 +33,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
 "numba",
-"numpy",
+"numpy>=1.22",
 "scikit-image"
 ]
 
@@ -90,22 +90,6 @@ report.exclude_also = [
   'if typing.TYPE_CHECKING:',
 ]
 
-[tool.mypy]
-files = ["src", "tests"]
-python_version = "3.8"
-warn_unused_configs = true
-strict = true
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-warn_unreachable = true
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-
-[[tool.mypy.overrides]]
-module = "pycosmommf.*"
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-
-
 [tool.ruff]
 
 [tool.ruff.lint]
@@ -133,6 +117,10 @@ extend-select = [
   "PD",       # pandas-vet
 ]
 ignore = [
+  "T201",     # print() used
+  "PLC2401",  # allow non-ASCII characters
+  "RUF002",   # allow usage of symbols like `𝒮`
+  "RUF003",   # allow usage of symbols like `𝒮`
   "PLR09",    # Too many <...>
   "PLR2004",  # Magic value used in comparison
   "ISC001",   # Conflicts with formatter

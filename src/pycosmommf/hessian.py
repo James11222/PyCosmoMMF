@@ -3,9 +3,8 @@ from __future__ import annotations
 import numba as nb
 import numpy as np
 
-from PyCosmoMMF.utils import *
-
 jit_compiler = nb.njit(fastmath=True)
+
 
 def fast_hessian_from_smoothed(f_Rn, R_S, kv):
     """
@@ -19,7 +18,7 @@ def fast_hessian_from_smoothed(f_Rn, R_S, kv):
         The smoothing scale.
     kv : 3D array
         The wavevectors.
-    
+
     Returns
     -------
     hessian : 3D array
@@ -41,24 +40,22 @@ def fast_hessian_from_smoothed(f_Rn, R_S, kv):
             for y in range(len(kv[1])):
                 for z in range(len(kv[2])):
                     # (1,1)
-                    hessian[x, y, z, 0] = - kx[x] * kx[x] * R_S**2 * f_Rn_hat[x, y, z]
+                    hessian[x, y, z, 0] = -kx[x] * kx[x] * R_S**2 * f_Rn_hat[x, y, z]
                     # (1,2)
-                    hessian[x, y, z, 1] = - kx[x] * ky[y] * R_S**2 * f_Rn_hat[x, y, z]
+                    hessian[x, y, z, 1] = -kx[x] * ky[y] * R_S**2 * f_Rn_hat[x, y, z]
                     # (1,3)
-                    hessian[x, y, z, 2] = - kx[x] * kz[z] * R_S**2 * f_Rn_hat[x, y, z]
+                    hessian[x, y, z, 2] = -kx[x] * kz[z] * R_S**2 * f_Rn_hat[x, y, z]
                     # (2,2)
-                    hessian[x, y, z, 3] = - ky[y] * ky[y] * R_S**2 * f_Rn_hat[x, y, z]
+                    hessian[x, y, z, 3] = -ky[y] * ky[y] * R_S**2 * f_Rn_hat[x, y, z]
                     # (2,3)
-                    hessian[x, y, z, 4] = - ky[y] * kz[z] * R_S**2 * f_Rn_hat[x, y, z]
+                    hessian[x, y, z, 4] = -ky[y] * kz[z] * R_S**2 * f_Rn_hat[x, y, z]
                     # (3,3)
-                    hessian[x, y, z, 5] = - kz[z] * kz[z] * R_S**2 * f_Rn_hat[x, y, z]
+                    hessian[x, y, z, 5] = -kz[z] * kz[z] * R_S**2 * f_Rn_hat[x, y, z]
         return hessian
-    
+
     hessian = perform_loop(hessian)
 
     for j in range(6):
         hessian[:, :, :, j] = np.fft.ifftn(hessian[:, :, :, j])
-    
+
     return np.real(hessian)
-
-
