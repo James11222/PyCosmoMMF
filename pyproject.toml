@@ -31,7 +31,11 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+"numba",
+"numpy",
+"scikit-image"
+]
 
 [project.optional-dependencies]
 test = [
