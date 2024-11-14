@@ -6,7 +6,7 @@ import numpy as np
 from .filter import smooth_gauss, smooth_loggauss, wavevectors3D
 from .hessian import fast_hessian_from_smoothed
 
-jit_compiler = nb.njit
+jit_compiler = nb.njit(parallel=True, fastmath=True)
 
 
 @jit_compiler

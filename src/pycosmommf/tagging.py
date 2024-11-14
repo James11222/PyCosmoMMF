@@ -6,7 +6,7 @@ import numba as nb
 import numpy as np
 import skimage.measure
 
-jit_compiler = nb.njit(fastmath=True)
+jit_compiler = nb.njit(parallel=True, fastmath=True)
 
 
 def make_the_clusbool(delta, max_sigs, Δ):  # pragma: no cover
