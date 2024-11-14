@@ -3,8 +3,8 @@
 [![Actions Status][actions-badge]][actions-link]
 [![Documentation Status][rtd-badge]][rtd-link]
 
+[![codecov](https://codecov.io/gh/James11222/PyCosmoMMF/graph/badge.svg?token=UCHHHXEV2D)](https://codecov.io/gh/James11222/PyCosmoMMF)
 [![PyPI version][pypi-version]][pypi-link]
-[![Conda-Forge][conda-badge]][conda-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
 
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
