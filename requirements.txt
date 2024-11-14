@@ -1,5 +1,0 @@
-numpy
-numba
-scikit-image
-matplotlib
-pytest

@@ -1,0 +1,12 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 2024.08.19
+_src_path: gh:scientific-python/cookie
+backend: hatch
+email: js7501@princeton.edu
+full_name: James Sunseri
+license: MIT
+org: James11222
+project_name: pycosmommf
+project_short_description: A package for identifying structures in the cosmic web.
+url: https://github.com/James11222/pycosmommf
+vcs: true
