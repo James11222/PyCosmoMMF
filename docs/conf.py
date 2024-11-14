@@ -48,6 +48,12 @@ html_theme_options: dict[str, Any] = {
     "source_directory": "docs/",
 }
 
+html_static_path = ["_static"]
+html_theme_options = {
+    "light_logo": "CosmoMMF_light.png",
+    "dark_logo": "CosmoMMF_Dark.png",
+}
+
 myst_enable_extensions = [
     "colon_fence",
 ]

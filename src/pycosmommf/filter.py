@@ -3,7 +3,7 @@ from __future__ import annotations
 import numba as nb
 import numpy as np
 
-jit_compiler = nb.njit(fastmath=True)
+jit_compiler = nb.njit(parallel=True, fastmath=True)
 
 
 def wavevectors3D(dims, box_size=(2 * np.pi, 2 * np.pi, 2 * np.pi)):

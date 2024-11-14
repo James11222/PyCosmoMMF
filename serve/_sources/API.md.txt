@@ -1,0 +1,10 @@
+```{include} ../README.md
+:start-after: <!-- start elevator-pitch -->
+:end-before: <!-- end elevator-pitch -->
+```
+
+## API Docs
+
+- {ref}`genindex`
+- {ref}`modindex`
+- {ref}`search`
