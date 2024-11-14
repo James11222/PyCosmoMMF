@@ -10,7 +10,7 @@ jit_compiler = nb.njit
 
 
 @jit_compiler
-def signatures_from_hessian(hessian):
+def signatures_from_hessian(hessian): # pragma: no cover
     """
     Function to calculate the signatures from a given hessian.
 
@@ -115,7 +115,7 @@ def maximum_signature(Rs, field, alg="NEXUSPLUS", eps=1e-8):
     sigmax = np.ones((nx, ny, nz, 3), dtype=np.float32) * eps
 
     @jit_compiler
-    def perform_loop(sigmax, sigs_Rn, nx, ny, nz):
+    def perform_loop(sigmax, sigs_Rn, nx, ny, nz): # pragma: no cover
         for ix in nb.prange(nx):
             for iy in range(ny):
                 for iz in range(nz):
