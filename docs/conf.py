@@ -3,10 +3,10 @@ from __future__ import annotations
 import importlib.metadata
 from typing import Any
 
-project = "pycosmommf"
+project = "PyCosmoMMF"
 copyright = "2024, James Sunseri"
 author = "James Sunseri"
-version = release = importlib.metadata.version("pycosmommf")
+# version = release = importlib.metadata.version("pycosmommf")
 
 extensions = [
     "myst_parser",
