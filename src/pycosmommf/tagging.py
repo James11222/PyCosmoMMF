@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import functools
-
+import numba as nb
 import numpy as np
 import skimage.measure
+
+jit_compiler = nb.njit(parallel=True, fastmath=True)
 
 
 def make_the_clusbool(delta, max_sigs, Δ):  # pragma: no cover
@@ -16,43 +17,57 @@ def make_the_clusbool(delta, max_sigs, Δ):  # pragma: no cover
     change in virialization fraction as a function of 𝒮_cluster.
 
     Arguments:
-
+    ----------------
     delta - [3D Float Array] - delta refers to the δ delta.
     max_sigs - [4D Float Array] - the maximum signatures array from CosmoMMF.maximum_signature()
     verbose - [Boolean] - a flag to allow the function to be more helpful and verbose.
     Δ - [Int] - The overdensity parameter threshold for determining virialization. This
     parameter comes from a paper by Gunn & Gott on spherical collapse. Commonly
     used values that are physically motivated can be 370, 200, or 500 (for R_200 or R_500).
+
+    Returns:
+    ----------------
+    clusbool - [3D Boolean Array] - a boolean filter that selects only the clusters in a given cosmological δ field.
+    S_th - [Float] - the threshold value for 𝒮_cluster.
+    signature_thresholds - [1D Float Array] - an array of threshold values for 𝒮_cluster.
+    virialized_fractions - [1D Float Array] - an array of virialized fractions as a function of 𝒮_cluster.
     """
 
     signature_thresholds = np.geomspace(0.1, 30, 10)  # hard coded for now
     virialized_fractions = np.zeros_like(signature_thresholds)
 
-    def check_virialized(j, delta, clumps, Δ):
-        δ_ave = np.mean(delta[clumps == j])
-        return int(δ_ave > Δ)
+    @jit_compiler
+    def calc_virialized_fraction(clumps):
+        nx, ny, nz = clumps.shape
+
+        total_clumps_detected = np.max(clumps)
+        summed_overdensity_per_clump = np.zeros(total_clumps_detected)
+        num_cells_per_clump = np.zeros(total_clumps_detected)
+
+        for i in nb.prange(nx):
+            for j in range(ny):
+                for k in range(nz):
+                    if clumps[i, j, k] != 0:
+                        clump_id = int(
+                            clumps[i, j, k]
+                        )  # clump_id is the clump number ranging from 1 to total_clumps_detected
+                        summed_overdensity_per_clump[clump_id - 1] += delta[i, j, k]
+                        num_cells_per_clump[clump_id - 1] += 1
+
+        return summed_overdensity_per_clump / num_cells_per_clump
 
     for i, S_th in enumerate(signature_thresholds):
         # Identify Clumps with S > S_th
         _clusbool = max_sigs[:, :, :, 0] > S_th
+
         clumps = skimage.measure.label(
-            _clusbool
+            _clusbool.astype(int)
         )  # an array where 0 is background and 1, 2, 3, ... are the clumps
-        total_clumps_detected = np.max(clumps)
+        averaged_overdensity_per_clump = calc_virialized_fraction(clumps)
 
-        num_clumps_virialized = np.sum(
-            list(
-                map(
-                    functools.partial(
-                        check_virialized, delta=delta, clumps=clumps, Δ=Δ
-                    ),
-                    range(1, total_clumps_detected + 1),
-                )
-            )
-        )  # number of clumps that are virialized
-
-        # Calculate the number of virialized clumps
-        virialized_fractions[i] = num_clumps_virialized / total_clumps_detected
+        virialized_fractions[i] = np.sum(averaged_overdensity_per_clump > Δ) / np.max(
+            clumps
+        )
 
     S_th = signature_thresholds[np.abs(virialized_fractions - 0.5).argmin()]
     clusbool = max_sigs[:, :, :, 0] > S_th
