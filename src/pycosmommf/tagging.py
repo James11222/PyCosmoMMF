@@ -18,7 +18,7 @@ def make_the_clusbool(delta, max_sigs, Δ):  # pragma: no cover
 
     Arguments:
     ----------------
-    delta - [3D Float Array] - delta refers to the δ delta.
+    delta - [3D Float Array] - delta refers to the δ field.
     max_sigs - [4D Float Array] - the maximum signatures array from CosmoMMF.maximum_signature()
     verbose - [Boolean] - a flag to allow the function to be more helpful and verbose.
     Δ - [Int] - The overdensity parameter threshold for determining virialization. This
@@ -75,14 +75,14 @@ def make_the_clusbool(delta, max_sigs, Δ):  # pragma: no cover
     return clusbool, S_th, signature_thresholds, virialized_fractions
 
 
-def calc_mass_change(sig_vec, delta_vec, Smin, Smax):
+def calc_mass_change(sig_vec, density_vec, Smin, Smax):
     """
     Calculate the mass change curve for a given structure type.
 
     Arguments:
     -----------
         sig_vec - [1D Float Array] - the signature values for a given structure type
-        delta_vec - [1D Float Array] - the delta values for a given structure type
+        density_vec - [1D Float Array] - the density values for a given structure type
         Smin - [Float] - the minimum signature value
         Smax - [Float] - the maximum signature value
 
@@ -98,7 +98,7 @@ def calc_mass_change(sig_vec, delta_vec, Smin, Smax):
     # Sum up all the mass in a structure type as a function of log(𝒮)
     for i in range(len(M)):
         filter = sig_vec > 10 ** log10S[i]
-        M[i] = np.sum(delta_vec[filter])
+        M[i] = np.sum(density_vec[filter])
 
     # Compute the derivative |dM^2/dlog(𝒮)|
     ΔM_2 = np.abs(np.diff(M**2) / np.diff(log10S))
@@ -111,14 +111,14 @@ def calc_mass_change(sig_vec, delta_vec, Smin, Smax):
 
 
 def calc_structure_bools(
-    delta, max_sigs, verbose, clusbool=None, Smin=-3, Smax=2, Δ=370
+    density_cube, max_sigs, verbose, clusbool=None, Smin=-3, Smax=2, Δ=370
 ):
     """
     Calculate the boolean filters for clusters, filaments, walls, and voids.
 
     Arguments:
     -----------
-        delta - [3D Float Array] - the δ delta
+        density_cube - [3D Float Array] - the δ+1 density_cube
         max_sigs - [4D Float Array] - the maximum signatures array from CosmoMMF.maximum_signature()
         verbose - [Boolean] - a flag to allow the function to be more helpful and verbose.
         clusbool - [3D Boolean Array] - the cluster boolean filter
@@ -144,7 +144,7 @@ def calc_structure_bools(
 
     """
 
-    N_cells = np.prod(delta.shape)
+    N_cells = np.prod(density_cube.shape)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     #                 Step 1. Create Cluster Boolean Filter
@@ -152,7 +152,7 @@ def calc_structure_bools(
 
     if clusbool is None:  # pragma: no cover
         clusbool, cluster_thresh, S_clus, f_vir_clus = make_the_clusbool(
-            delta, max_sigs, Δ
+            density_cube - 1.0, max_sigs, Δ
         )
     else:
         cluster_thresh = None
@@ -170,10 +170,12 @@ def calc_structure_bools(
     # Isolate Valid Filaments (not clusters)
     not_clus_flat = np.reshape(clusbool == False, N_cells)  # noqa: E712
     filament_valid = filament_signature[not_clus_flat]
-    flat_delta_valid = np.reshape(delta, N_cells)[not_clus_flat]
+    flat_density_cube_valid = np.reshape(density_cube, N_cells)[not_clus_flat]
 
     # Compute Mass Change Curves and Find Filament Threshold
-    S_fil, dM2_fil = calc_mass_change(filament_valid, flat_delta_valid, Smin, Smax)
+    S_fil, dM2_fil = calc_mass_change(
+        filament_valid, flat_density_cube_valid, Smin, Smax
+    )
     ind = np.argmax(dM2_fil)
     filament_thresh = S_fil[ind]
     filbool = (max_sigs[:, :, :, 1] > filament_thresh) & (~clusbool)
@@ -185,10 +187,10 @@ def calc_structure_bools(
     # Isolate Valid Walls (not clusters or filaments)
     wall_valid_filt = (not_clus_flat) & (filament_signature < filament_thresh)
     wall_valid = wall_signature[wall_valid_filt]
-    wall_delta_valid = np.reshape(delta, N_cells)[wall_valid_filt]
+    wall_density_cube_valid = np.reshape(density_cube, N_cells)[wall_valid_filt]
 
     # Compute Mass Change Curves and Find Wall Threshold
-    S_wall, dM2_wall = calc_mass_change(wall_valid, wall_delta_valid, Smin, Smax)
+    S_wall, dM2_wall = calc_mass_change(wall_valid, wall_density_cube_valid, Smin, Smax)
     ind = np.argmax(dM2_wall)
     wall_thresh = S_wall[ind]
     wallbool = (max_sigs[:, :, :, 2] > wall_thresh) & ~(filbool | clusbool)
@@ -205,7 +207,7 @@ def calc_structure_bools(
         print("---------------------------------------\n")
 
         volume_fraction = np.sum(clusbool) / N_cells
-        mass_fraction = np.sum(delta[clusbool]) / np.sum(delta)
+        mass_fraction = np.sum(density_cube[clusbool]) / np.sum(density_cube)
 
         print("Signature Threshold of Clusters:", cluster_thresh)
         print("Volume Fraction of Clusters:", volume_fraction)
@@ -217,7 +219,7 @@ def calc_structure_bools(
         print("---------------------------------------\n")
 
         volume_fraction = np.sum(filbool) / N_cells
-        mass_fraction = np.sum(delta[filbool]) / np.sum(delta)
+        mass_fraction = np.sum(density_cube[filbool]) / np.sum(density_cube)
 
         print("Signature Threshold of Filaments:", filament_thresh)
         print("Volume Fraction of Filaments:", volume_fraction)
@@ -229,7 +231,7 @@ def calc_structure_bools(
         print("---------------------------------------\n")
 
         volume_fraction = np.sum(wallbool) / N_cells
-        mass_fraction = np.sum(delta[wallbool]) / np.sum(delta)
+        mass_fraction = np.sum(density_cube[wallbool]) / np.sum(density_cube)
 
         print("Signature Threshold of Walls:", wall_thresh)
         print("Volume Fraction of Walls:", volume_fraction)
@@ -241,7 +243,7 @@ def calc_structure_bools(
         print("---------------------------------------\n")
 
         volume_fraction = np.sum(voidbool) / N_cells
-        mass_fraction = np.sum(delta[voidbool]) / np.sum(delta)
+        mass_fraction = np.sum(density_cube[voidbool]) / np.sum(density_cube)
 
         print("Volume Fraction of Voids:", volume_fraction)
         print("Mass Fraction of Voids:", mass_fraction)
