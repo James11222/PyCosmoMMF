@@ -30,7 +30,7 @@ def test_calc_structure_bools():
         np.roll(m.sphere(32, 2), -10, axis=0) + np.roll(m.sphere(32, 2), 10, axis=0)
     ) >= 1
     clusbool, filbool, wallbool, voidbool, summary_stats = m.calc_structure_bools(
-        delta=field,
+        field,
         max_sigs=sigs,
         verbose=True,
         clusbool=clusbool,
@@ -45,7 +45,7 @@ def test_calc_structure_bools():
     assert type(summary_stats) is dict
 
     clusbool, filbool, wallbool, voidbool = m.calc_structure_bools(
-        delta=field,
+        field,
         max_sigs=sigs,
         verbose=False,
         clusbool=clusbool,
