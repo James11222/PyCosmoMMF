@@ -99,7 +99,7 @@ def maximum_signature(Rs, field, alg="NEXUSPLUS", eps=1e-8):
     sigmax : 4D array
         The maximum signatures.
     """
-    if alg not in ["NEXUS", "NEXUSPLUS"]:
+    if alg not in ["NEXUS", "NEXUSPLUS"]:  # pragma: no cover
         msg = "alg must be either 'NEXUS' or 'NEXUSPLUS'"
         raise ValueError(msg)
 

@@ -42,3 +42,18 @@ def test_calc_structure_bools():
     assert filbool.shape == (32, 32, 32)
     assert wallbool.shape == (32, 32, 32)
     assert voidbool.shape == (32, 32, 32)
+    assert type(summary_stats) is dict
+
+    clusbool, filbool, wallbool, voidbool = m.calc_structure_bools(
+        delta=field,
+        max_sigs=sigs,
+        verbose=False,
+        clusbool=clusbool,
+        Smin=-3,
+        Smax=2,
+        Δ=370,
+    )
+    assert clusbool.shape == (32, 32, 32)
+    assert filbool.shape == (32, 32, 32)
+    assert wallbool.shape == (32, 32, 32)
+    assert voidbool.shape == (32, 32, 32)

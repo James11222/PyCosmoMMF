@@ -150,7 +150,7 @@ def calc_structure_bools(
     #                 Step 1. Create Cluster Boolean Filter
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if clusbool is None:
+    if clusbool is None:  # pragma: no cover
         clusbool, cluster_thresh, S_clus, f_vir_clus = make_the_clusbool(
             delta, max_sigs, Δ
         )
