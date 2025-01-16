@@ -206,47 +206,47 @@ def calc_structure_bools(
         print("     Cluster Boolean Filter Report    ")
         print("---------------------------------------\n")
 
-        volume_fraction = np.sum(clusbool) / N_cells
-        mass_fraction = np.sum(density_cube[clusbool]) / np.sum(density_cube)
+        volume_fraction_clus = np.sum(clusbool) / N_cells
+        mass_fraction_clus = np.sum(density_cube[clusbool]) / np.sum(density_cube)
 
         print("Signature Threshold of Clusters:", cluster_thresh)
-        print("Volume Fraction of Clusters:", volume_fraction)
-        print("Mass Fraction of Clusters:", mass_fraction)
+        print("Volume Fraction of Clusters:", volume_fraction_clus)
+        print("Mass Fraction of Clusters:", mass_fraction_clus)
         print("")
 
         print("---------------------------------------")
         print("     Filament Boolean Filter Report    ")
         print("---------------------------------------\n")
 
-        volume_fraction = np.sum(filbool) / N_cells
-        mass_fraction = np.sum(density_cube[filbool]) / np.sum(density_cube)
+        volume_fraction_fil = np.sum(filbool) / N_cells
+        mass_fraction_fil = np.sum(density_cube[filbool]) / np.sum(density_cube)
 
         print("Signature Threshold of Filaments:", filament_thresh)
-        print("Volume Fraction of Filaments:", volume_fraction)
-        print("Mass Fraction of Filaments:", mass_fraction)
+        print("Volume Fraction of Filaments:", volume_fraction_fil)
+        print("Mass Fraction of Filaments:", mass_fraction_fil)
         print("")
 
         print("---------------------------------------")
         print("       Wall Boolean Filter Report      ")
         print("---------------------------------------\n")
 
-        volume_fraction = np.sum(wallbool) / N_cells
-        mass_fraction = np.sum(density_cube[wallbool]) / np.sum(density_cube)
+        volume_fraction_wall = np.sum(wallbool) / N_cells
+        mass_fraction_wall = np.sum(density_cube[wallbool]) / np.sum(density_cube)
 
         print("Signature Threshold of Walls:", wall_thresh)
-        print("Volume Fraction of Walls:", volume_fraction)
-        print("Mass Fraction of Walls:", mass_fraction)
+        print("Volume Fraction of Walls:", volume_fraction_wall)
+        print("Mass Fraction of Walls:", mass_fraction_wall)
         print("")
 
         print("---------------------------------------")
         print("       Void Boolean Filter Report      ")
         print("---------------------------------------\n")
 
-        volume_fraction = np.sum(voidbool) / N_cells
-        mass_fraction = np.sum(density_cube[voidbool]) / np.sum(density_cube)
+        volume_fraction_void = np.sum(voidbool) / N_cells
+        mass_fraction_void = np.sum(density_cube[voidbool]) / np.sum(density_cube)
 
-        print("Volume Fraction of Voids:", volume_fraction)
-        print("Mass Fraction of Voids:", mass_fraction)
+        print("Volume Fraction of Voids:", volume_fraction_void)
+        print("Mass Fraction of Voids:", mass_fraction_void)
         print("\n---------------------------------------\n")
 
         summary_data = {
@@ -254,8 +254,22 @@ def calc_structure_bools(
             "f_vir_clus": f_vir_clus,
             "S_fil": S_fil,
             "dM2_fil": dM2_fil,
+            "S_fil_thresh": filament_thresh,
             "S_wall": S_wall,
             "dM2_wall": dM2_wall,
+            "S_wall_thresh": wall_thresh,
+            "mass_fractions": [
+                mass_fraction_clus,
+                mass_fraction_fil,
+                mass_fraction_wall,
+                mass_fraction_void,
+            ],
+            "volume_fractions": [
+                volume_fraction_clus,
+                volume_fraction_fil,
+                volume_fraction_wall,
+                volume_fraction_void,
+            ],
         }
 
         return clusbool, filbool, wallbool, voidbool, summary_data
