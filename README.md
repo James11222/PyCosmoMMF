@@ -2,6 +2,7 @@
 
 [![Actions Status][actions-badge]][actions-link]
 [![Documentation Status][rtd-badge]][rtd-link]
+[![DOI](https://zenodo.org/badge/770792459.svg)](https://doi.org/10.5281/zenodo.14876495)
 
 [![codecov](https://codecov.io/gh/James11222/PyCosmoMMF/graph/badge.svg?token=UCHHHXEV2D)](https://codecov.io/gh/James11222/PyCosmoMMF)
 [![PyPI version][pypi-version]][pypi-link]
