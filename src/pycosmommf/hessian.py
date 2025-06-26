@@ -10,19 +10,17 @@ def fast_hessian_from_smoothed(f_Rn, R_S, kv):
     """
     Compute the hessian matrix of the smoothed field f_Rn.
 
-    Parameters
-    ----------
-    f_Rn : 3D array
-        The smoothed field.
-    R_S : float
-        The smoothing scale.
-    kv : 3D array
-        The wavevectors.
+    Args:
+        f_Rn (:obj:`3D float np.ndarray`):
+            The smoothed field in real space.
+        R_S (:obj:`float`):
+            The smoothing scale in units of voxels.
+        kv (:obj:`tuple`):
+            The wavevectors in each dimension.
 
-    Returns
-    -------
-    hessian : 3D array
-        The hessian matrix.
+    Returns:
+        (:obj:`4D float np.ndarray`): The hessian matrix of the smoothed field.
+        The shape is ``(nx, ny, nz, 6)``, where ``nx, ny, nz`` are the dimensions of ``f_Rn``.
     """
 
     f_Rn_hat = np.fft.fftn(f_Rn)

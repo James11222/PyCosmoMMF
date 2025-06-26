@@ -14,15 +14,15 @@ def signatures_from_hessian(hessian):  # pragma: no cover
     """
     Function to calculate the signatures from a given hessian.
 
-    Parameters
-    ----------
-    hessian : 4D array
-        The hessian matrix.
+    Args:
+        hessian (:obj:`4D float np.ndarray`):
+            The hessian matrix of the smoothed field, with shape ``(nx, ny, nz, 6)``.
 
-    Returns
-    -------
-    sigs : 4D array
-        The signatures.
+    Returns:
+        (:obj:`4D float np.ndarray`): The signatures array with shape ``(nx, ny, nz, 3)``. Each signature corresponds to a different type of structure:
+            - ``sigs[..., 0]``: Cluster signature
+            - ``sigs[..., 1]``: Filament signature
+            - ``sigs[..., 2]``: Wall signature
     """
 
     hsize = hessian.shape[:3]
@@ -78,35 +78,34 @@ def signatures_from_hessian(hessian):  # pragma: no cover
     return sigs
 
 
-def maximum_signature(Rs, field, alg="NEXUSPLUS", eps=1e-8):
+def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-8):
     """
     Compute the maximum signatures across all scales Rs.
 
-    Parameters
-    ----------
-    Rs : array
-        The scales.
-    field : 3D array
-        The field.
-    alg : string, optional
-        The algorithm to use. Can be either 'NEXUS' or 'NEXUSPLUS'.
-        Default is 'NEXUSPLUS'.
-    eps : float, optional
-        A small number to avoid division by zero errors and whatnot. Default is 1e-8.
+    Args:
+        Rs (:obj:`list` of :obj:`float`):
+            List of smoothing scales in units of voxels.
+        density_cube (:obj:`3D float np.ndarray`):
+            The 3D density field to analyze.
+        algorithm (:obj:`str`, optional):
+            The algorithm to use for smoothing. Can be either "NEXUS" or "NEXUSPLUS". Defaults to "NEXUSPLUS".
+        eps (:obj:`float`, optional):
+            Small value to avoid division by zero. Defaults to ``1e-8``.
 
-    Returns
-    -------
-    sigmax : 4D array
-        The maximum signatures.
+    Returns:
+        (:obj:`4D float np.ndarray`):
+            An array of signatures with shape ``(nx, ny, nz, 3)``, where ``nx, ny, nz`` are the dimensions of the input ``density_cube``.
+            The last dimension contains the signatures for clusters, filaments, and walls respectively.
     """
-    if alg not in ["NEXUS", "NEXUSPLUS"]:  # pragma: no cover
-        msg = "alg must be either 'NEXUS' or 'NEXUSPLUS'"
+
+    if algorithm not in ["NEXUS", "NEXUSPLUS"]:  # pragma: no cover
+        msg = "algorithm must be either 'NEXUS' or 'NEXUSPLUS'"
         raise ValueError(msg)
 
-    nx, ny, nz = field.shape
+    nx, ny, nz = density_cube.shape
 
     # Make sure the field has no 0 values
-    field = field + eps
+    density_cube = density_cube + eps
 
     # Calculate wave vectors for our field
     wave_vecs = wavevectors3D((nx, ny, nz))
@@ -125,10 +124,10 @@ def maximum_signature(Rs, field, alg="NEXUSPLUS", eps=1e-8):
                         )
 
     for R in Rs:
-        if alg == "NEXUS":
-            f_Rn = smooth_gauss(field, R, wave_vecs)
-        elif alg == "NEXUSPLUS":
-            f_Rn = smooth_loggauss(field, R, wave_vecs)
+        if algorithm == "NEXUS":
+            f_Rn = smooth_gauss(density_cube, R, wave_vecs)
+        elif algorithm == "NEXUSPLUS":
+            f_Rn = smooth_loggauss(density_cube, R, wave_vecs)
 
         H_Rn = fast_hessian_from_smoothed(f_Rn, R, wave_vecs)
 

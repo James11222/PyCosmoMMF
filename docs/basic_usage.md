@@ -46,7 +46,7 @@ density_field = np.load("path/to/density_field.npy")
 Rs = [sqrt(2) ** n for n in range(10)]  # smoothing scales
 
 max_signatures = PyCosmoMMF.maximum_signature(
-    Rs, density_field, alg="NEXUSPLUS"
+    Rs, density_field, algorithm="NEXUSPLUS"
 )  # compute maximum signatures
 ```
 
@@ -67,18 +67,13 @@ output of this can be seen below
 
 We then have the option of running the tagging scheme a few different ways. The
 first important argument in `calc_structure_bools()` besides the `density_field`
-and the `max_signatures` arrays is the `verbose_flag`. When
-
-set to `True` the code gives a lot more information and provides a few plots.
-This is best turned on when
-
-debugging the code. When `verbose_flag` is turned on there are 4 additional
-outputs to the `calc_structure_bools()`
-
-function: `S_fil, dM2_fil, S_wall, dM2_wall` which can be used to make the mass
-change curves for filaments and
-
-walls.
+and the `max_signatures` arrays is the `verbose_flag`. When set to `True` the
+code gives a lot more information and provides a few plots. This is best turned
+on when debugging the code. When `verbose_flag` is turned on there is an
+additional output to the `calc_structure_bools()` function: `summary_data` which
+is a dictionary containing all the relevant extra information one might need. It
+can be used to make the mass change curves for filaments and walls. Consult the
+API Docs tab for a detailed summary of what is inside `summary_data`.
 
 **_Verbose Flag On:_**
 
@@ -86,8 +81,8 @@ walls.
 verbose_flag = True  # or False
 
 
-clusbool, filbool, wallbool, voidbool, S_fil, dM2_fil, S_wall, dM2_wall = (
-    PyCosmoMMF.calc_structure_bools(density_field, max_signatures, verbose_flag)
+clusbool, filbool, wallbool, voidbool, summary_data = PyCosmoMMF.calc_structure_bools(
+    density_field, max_signatures, verbose_flag
 )  # tag structures
 ```
 
@@ -125,11 +120,13 @@ clusbool, filbool, wallbool, voidbool = PyCosmoMMF.calc_structure_bools(
 ```
 
 Another important optional argument in the `calc_structure_bools()` function is
-`Δ`. The default value is `Δ = 370` as used in
+`overdensity_threshold`. The default value is `overdensity_threshold = 370` as
+used in
 [Cautun et al. 2013](https://academic.oup.com/mnras/article/429/2/1286/1038906)
-but other values can be 200 or 500 corresponding to `R_200` or `R_500`. `Δ` is
-the overdensity parameter, when clusters achieve a density greater than this
-value, they are thought to be virialized/collapsed.
+but other values can be 200 or 500 corresponding to `R_200` or `R_500`.
+`overdensity_threshold` is the overdensity parameter Δ, when clusters achieve an
+average overdensity greater than this value, they are thought to be
+virialized/collapsed.
 
 The boolean filters for each structure type produced by `calc_structure_bools()`
 can be used to tag structures within a density field, the results of this can be

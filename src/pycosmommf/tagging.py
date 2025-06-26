@@ -7,30 +7,30 @@ import skimage.measure
 jit_compiler = nb.njit(parallel=True, fastmath=True)
 
 
-def make_the_clusbool(delta, max_sigs, Δ):  # pragma: no cover
+def make_the_clusbool(delta, max_sigs, overdensity_threshold):  # pragma: no cover
     """
-    make_the_clusbool() - Documentation
-
-    A function that creates a Boolean Filter which selects only
+    A function that creates a bool Filter which selects only
     the clusters in a given cosmological δ field. This function accomplishes
     this by finding a threshold value for 𝒮_cluster by looking at the
     change in virialization fraction as a function of 𝒮_cluster.
 
-    Arguments:
-    ----------------
-    delta - [3D Float Array] - delta refers to the δ field.
-    max_sigs - [4D Float Array] - the maximum signatures array from CosmoMMF.maximum_signature()
-    verbose - [Boolean] - a flag to allow the function to be more helpful and verbose.
-    Δ - [Int] - The overdensity parameter threshold for determining virialization. This
-    parameter comes from a paper by Gunn & Gott on spherical collapse. Commonly
-    used values that are physically motivated can be 370, 200, or 500 (for R_200 or R_500).
+    Args:
+        delta (:obj:`3D float np.ndarray`):
+            delta refers to the (δ = ρ / <ρ> - 1) field, this is NOT the (δ + 1 = ρ / <ρ>) field.
+        max_sigs (:obj:`4D float np.ndarray`):
+            the maximum signatures array from the ``maximum_signature()`` function.
+        verbose_flag (:obj:`bool`):
+            a flag to allow the function to be more helpful and verbose.
+        overdensity_threshold (:obj:`float`):
+            The overdensity parameter threshold for determining virialization. Commonly used values
+            that are physically motivated can be 370, 200, or 500.
 
     Returns:
-    ----------------
-    clusbool - [3D Boolean Array] - a boolean filter that selects only the clusters in a given cosmological δ field.
-    S_th - [Float] - the threshold value for 𝒮_cluster.
-    signature_thresholds - [1D Float Array] - an array of threshold values for 𝒮_cluster.
-    virialized_fractions - [1D Float Array] - an array of virialized fractions as a function of 𝒮_cluster.
+        (tuple): a tuple containing:
+            - **clusbool** (:obj:`3D bool np.ndarray`): a boolean filter that selects only the clusters in a given cosmological δ field.
+            - **S_th** (:obj:`float`): the threshold value for 𝒮_cluster.
+            - **signature_thresholds** (:obj:`1D float np.ndarray`): an array of threshold values for 𝒮_cluster.
+            - **virialized_fractions** (:obj:`1D float np.ndarray`): an array of virialized fractions as a function of 𝒮_cluster.
     """
 
     signature_thresholds = np.geomspace(0.1, 30, 10)  # hard coded for now
@@ -65,9 +65,9 @@ def make_the_clusbool(delta, max_sigs, Δ):  # pragma: no cover
         )  # an array where 0 is background and 1, 2, 3, ... are the clumps
         averaged_overdensity_per_clump = calc_virialized_fraction(clumps)
 
-        virialized_fractions[i] = np.sum(averaged_overdensity_per_clump > Δ) / np.max(
-            clumps
-        )
+        virialized_fractions[i] = np.sum(
+            averaged_overdensity_per_clump > overdensity_threshold
+        ) / np.max(clumps)
 
     S_th = signature_thresholds[np.abs(virialized_fractions - 0.5).argmin()]
     clusbool = max_sigs[:, :, :, 0] > S_th
@@ -79,17 +79,20 @@ def calc_mass_change(sig_vec, density_vec, Smin, Smax):
     """
     Calculate the mass change curve for a given structure type.
 
-    Arguments:
-    -----------
-        sig_vec - [1D Float Array] - the signature values for a given structure type
-        density_vec - [1D Float Array] - the density values for a given structure type
-        Smin - [Float] - the minimum signature value
-        Smax - [Float] - the maximum signature value
+    Args:
+        sig_vec (:obj:`1D float np.ndarray`):
+            the signature values for a given structure type
+        density_vec (:obj:`1D float np.ndarray`):
+            the density values for a given structure type
+        Smin (:obj:`float`):
+            the minimum signature value
+        Smax (:obj:`float`):
+            the maximum signature value
 
     Returns:
-    -----------
-        S - [1D Float Array] - the signature values
-        ΔM_2 - [1D Float Array] - the mass change curve
+        (tuple): a tuple containing:
+            - **S** (:obj:`1D float np.ndarray`): the signature values
+            - **ΔΜ_2** (:obj:`1D float np.ndarray`): the mass change curve
     """
     # Initialize our arrays
     log10S = np.arange(Smin, Smax + 0.1, 0.1)
@@ -111,48 +114,75 @@ def calc_mass_change(sig_vec, density_vec, Smin, Smax):
 
 
 def calc_structure_bools(
-    density_cube, max_sigs, verbose, clusbool=None, Smin=-3, Smax=2, Δ=370
+    density_cube,
+    max_sigs,
+    verbose_flag,
+    clusbool=None,
+    Smin=-3,
+    Smax=2,
+    overdensity_threshold=370,
 ):
     """
     Calculate the boolean filters for clusters, filaments, walls, and voids.
 
-    Arguments:
-    -----------
-        density_cube - [3D Float Array] - the δ+1 density_cube
-        max_sigs - [4D Float Array] - the maximum signatures array from CosmoMMF.maximum_signature()
-        verbose - [Boolean] - a flag to allow the function to be more helpful and verbose.
-        clusbool - [3D Boolean Array] - the cluster boolean filter
-        Smin - [Float] - the minimum signature value
-        Smax - [Float] - the maximum signature value
-        Δ - [Int] - the overdensity parameter threshold for determining virialization
+    Args:
+        density_cube (:obj:`3D float np.ndarray`):
+            the (δ+1 = ρ/<ρ>) ``density_cube``, this is NOT (δ = ρ/<ρ> - 1).
+        max_sigs (:obj:`4D float np.ndarray`):
+            the maximum signatures array from CosmoMMF.maximum_signature()
+        verbose_flag (:obj:`bool`) :
+            a flag to allow the function to be more helpful and verbose.
+        clusbool (:obj:`bool np.ndarray`, optional):
+            the cluster boolean filter
+        Smin (:obj:`float`, optional):
+            the minimum signature value
+        Smax (:obj:`float`, optional):
+            the maximum signature value
+        overdensity_threshold (:obj:`int`, optional):
+            the overdensity parameter threshold for determining virialization
 
     Returns:
-    -----------
-        clusbool - [3D Boolean Array] - the cluster boolean filter
-        filbool - [3D Boolean Array] - the filament boolean filter
-        wallbool - [3D Boolean Array] - the wall boolean filter
-        voidbool - [3D Boolean Array] - the void boolean filter
-
-        VERBOSE ONLY:
-            summary_data - [Dict] - a dictionary containing the following keys:
-                S_clus - [1D Float Array] - the signature values for clusters
-                f_vir_clus - [1D Float Array] - the virialization fraction for clusters
-                S_fil - [1D Float Array] - the signature values for filaments
-                dM2_fil - [1D Float Array] - the mass change curve for filaments
-                S_wall - [1D Float Array] - the signature values for walls
-                dM2_wall - [1D Float Array] - the mass change curve for walls
-
+        (tuple): a tuple containing:
+            - **clusbool** (:obj:`3D bool np.ndarray`): the cluster boolean filter
+            - **filbool** (:obj:`3D bool np.ndarray`): the filament boolean filter
+            - **wallbool** (:obj:`3D bool np.ndarray`): the wall boolean filter
+            - **voidbool** (:obj:`3D bool np.ndarray`): the void boolean filter
+            - **summary_data** (:obj:`dict`): a dictionary returned only when ``verbose_flag = True``, it contains the following keys:
+                - **S_clus** (:obj:`1D float np.ndarray`): the signature values for clusters
+                - **f_vir_clus** (:obj:`1D float np.ndarray`): the virialization fraction for clusters
+                - **S_fil** (:obj:`1D float np.ndarray`): the signature values for filaments
+                - **dM2_fil** (:obj:`1D float np.ndarray`): the mass change curve for filaments
+                - **S_fil_thresh** (:obj:`float`): the threshold value for filaments
+                - **S_wall** (:obj:`1D float np.ndarray`): the signature values for walls
+                - **dM2_wall** (:obj:`1D float np.ndarray`): the mass change curve for walls
+                - **S_wall_thresh** (:obj:`float`): the threshold value for walls
+                - **mass_fractions** (:obj:`1D float np.ndarray`): a list of mass fractions for clusters, filaments, walls, and voids
+                - **volume_fractions** (:obj:`1D float np.ndarray`): a list of volume fractions for clusters, filaments, walls, and voids
     """
 
     N_cells = np.prod(density_cube.shape)
 
+    # Check if the input density_cube is actually δ
+    if np.isclose(np.abs(np.mean(density_cube)), 0, atol=1e-3):
+        msg = "make sure that you are not inputing the overdensity field δ = ρ/<ρ> - 1, but rather δ + 1 = ρ/<ρ>."
+        raise ValueError(msg)
+
+    # Check if the input density_cube is actually δ + 1 = ρ/<ρ> or just ρ
+    if np.mean(density_cube) > 1.0:
+        # If the mean is greater than 1, we assume it is simply ρ, but we want to transform to δ + 1 = ρ/<ρ>
+        if verbose_flag:  # pragma: no cover
+            print(
+                "Input density_cube is in density units, transforming to δ + 1 = ρ/<ρ>."
+            )
+        density_cube /= np.mean(density_cube)  # normalize to mean = 1
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    #                 Step 1. Create Cluster Boolean Filter
+    #                 Step 1. Create Cluster bool Filter
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     if clusbool is None:  # pragma: no cover
         clusbool, cluster_thresh, S_clus, f_vir_clus = make_the_clusbool(
-            density_cube - 1.0, max_sigs, Δ
+            density_cube - 1.0, max_sigs, overdensity_threshold
         )
     else:
         cluster_thresh = None
@@ -160,7 +190,7 @@ def calc_structure_bools(
         f_vir_clus = None
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    #                 Step 2. Create Filament Boolean Filter
+    #                 Step 2. Create Filament bool Filter
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # we create 3 N^3 arrays with the signature corresponding to each structure
@@ -181,7 +211,7 @@ def calc_structure_bools(
     filbool = (max_sigs[:, :, :, 1] > filament_thresh) & (~clusbool)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    #                   Step 3. Create Wall Boolean Filter
+    #                   Step 3. Create Wall bool Filter
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # Isolate Valid Walls (not clusters or filaments)
@@ -196,14 +226,14 @@ def calc_structure_bools(
     wallbool = (max_sigs[:, :, :, 2] > wall_thresh) & ~(filbool | clusbool)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    #                   Step 4. Create Void Boolean Filter
+    #                   Step 4. Create Void bool Filter
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     voidbool = (clusbool + filbool + wallbool) == 0
 
-    if verbose:
+    if verbose_flag:
         print("---------------------------------------")
-        print("     Cluster Boolean Filter Report    ")
+        print("     Cluster bool Filter Report    ")
         print("---------------------------------------\n")
 
         volume_fraction_clus = np.sum(clusbool) / N_cells
@@ -215,7 +245,7 @@ def calc_structure_bools(
         print("")
 
         print("---------------------------------------")
-        print("     Filament Boolean Filter Report    ")
+        print("     Filament bool Filter Report    ")
         print("---------------------------------------\n")
 
         volume_fraction_fil = np.sum(filbool) / N_cells
@@ -227,7 +257,7 @@ def calc_structure_bools(
         print("")
 
         print("---------------------------------------")
-        print("       Wall Boolean Filter Report      ")
+        print("       Wall bool Filter Report      ")
         print("---------------------------------------\n")
 
         volume_fraction_wall = np.sum(wallbool) / N_cells
@@ -239,7 +269,7 @@ def calc_structure_bools(
         print("")
 
         print("---------------------------------------")
-        print("       Void Boolean Filter Report      ")
+        print("       Void bool Filter Report      ")
         print("---------------------------------------\n")
 
         volume_fraction_void = np.sum(voidbool) / N_cells

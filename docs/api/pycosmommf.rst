@@ -3,8 +3,8 @@ pycosmommf package
 
 .. automodule:: pycosmommf
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------
@@ -14,37 +14,37 @@ pycosmommf.filter module
 
 .. automodule:: pycosmommf.filter
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 pycosmommf.hessian module
 -------------------------
 
 .. automodule:: pycosmommf.hessian
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 pycosmommf.signatures module
 ----------------------------
 
 .. automodule:: pycosmommf.signatures
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 pycosmommf.tagging module
 -------------------------
 
 .. automodule:: pycosmommf.tagging
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 pycosmommf.utils module
 -----------------------
 
 .. automodule:: pycosmommf.utils
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

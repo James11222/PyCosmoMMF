@@ -8,19 +8,19 @@ jit_compiler = nb.njit(parallel=True, fastmath=True)
 
 def wavevectors3D(dims, box_size=(2 * np.pi, 2 * np.pi, 2 * np.pi)):
     """
-    Returns the wavevectors for a 3D grid of dimensions `dims` and box size `box_size`.
+    Returns the wavevectors for a 3D grid of dimensions ``dims`` and box size ``box_size``.
 
-    Parameters
-    ----------
-    dims : tuple
-        The dimensions of the grid.
-    box_size : tuple
-        The size of the box in each dimension.
+    Args:
+        dims (:obj:`tuple`):
+            The dimensions of the grid ``(nx, ny, nz)``.
+        box_size (:obj:`tuple`, optional):
+            The size of the box in each dimension ``(Lx, Ly, Lz)``. Defaults to ``(2π, 2π, 2π)``.
 
-    Returns
-    -------
-    kx, ky, kz : tuple
-        The wavevectors in each dimension.
+    Returns:
+        (tuple): a tuple containing:
+            - **kx** (:obj:`np.ndarray`): The wavevector in the x-direction.
+            - **ky** (:obj:`np.ndarray`): The wavevector in the y-direction.
+            - **kz** (:obj:`np.ndarray`): The wavevector in the z-direction.
     """
     sample_rate = 2 * np.pi * (np.array(dims) / box_size)
     kx = (np.fft.fftfreq(dims[0], 1 / sample_rate[0]) * (2 * np.pi / dims[0])).astype(
@@ -40,17 +40,14 @@ def kspace_gaussian_filter(R_S, kv):  # pragma: no cover
     """
     create a Gaussian filter in k-space.
 
-    Parameters
-    ----------
-    R_S : float
-        The smoothing scale.
-    kv : tuple
-        The wavevectors in each dimension.
+    Args:
+        R_S (:obj:`float`):
+            The smoothing scale.
+        kv (:obj:`tuple`):
+            The wavevectors in each dimension, each a ``1D float np.ndarray``.
 
-    Returns
-    -------
-    filter_k : array
-        The filter in k-space.
+    Returns:
+        (:obj:`3D float np.ndarray`): The filter in k-space.
     """
     kx, ky, kz = kv
     nx, ny, nz = len(kx), len(ky), len(kz)
@@ -69,17 +66,14 @@ def kspace_top_hat_filter(R_S, kv):  # pragma: no cover
     """
     create a top-hat filter in k-space.
 
-    Parameters
-    ----------
-    R_S : float
-        The smoothing scale.
-    kv : tuple
-        The wavevectors in each dimension.
+    Args:
+        R_S (:obj:`float`):
+            The smoothing scale.
+        kv (:obj:`tuple`):
+            The wavevectors in each dimension.
 
-    Returns
-    -------
-    filter_k : array
-        The filter in k-space.
+    Returns:
+        (:obj:`3D float np.ndarray`): The filter in k-space.
     """
 
     kx, ky, kz = kv
@@ -106,19 +100,16 @@ def smooth_top_hat(f, R_S, kv):
     """
     apply a top-hat filter to a field f.
 
-    Parameters
-    ----------
-    f : array
-        The field to be smoothed.
-    R_S : float
-        The smoothing scale.
-    kv : tuple
-        The wavevectors in each dimension.
+    Args:
+        f (:obj:`3D float np.ndarray`):
+            The field to be smoothed.
+        R_S (:obj:`float`):
+            The smoothing scale in units of voxels.
+        kv (:obj:`tuple`):
+            The wavevectors in each dimension.
 
-    Returns
-    -------
-    f_Rn : array
-        The smoothed field.
+    Returns:
+        (:obj:`3D float np.ndarray`): The smoothed field.
     """
     GF = kspace_top_hat_filter(R_S, kv)
     f_Rn = np.real(np.fft.ifftn(GF * np.fft.fftn(f)))
@@ -130,19 +121,16 @@ def smooth_gauss(f, R_S, kv):
     """
     apply a Gaussian filter to a field f.
 
-    Parameters
-    ----------
-    f : array
-        The field to be smoothed.
-    R_S : float
-        The smoothing scale.
-    kv : tuple
-        The wavevectors in each dimension.
+    Args:
+        f (:obj:`3D float np.ndarray`):
+            The field to be smoothed.
+        R_S (:obj:`float`):
+            The smoothing scale in units of voxels.
+        kv (:obj:`tuple`):
+            The wavevectors in each dimension.
 
-    Returns
-    -------
-    f_Rn : array
-        The smoothed field.
+    Returns:
+        (:obj:`3D float np.ndarray`): The smoothed field.
     """
     GF = kspace_gaussian_filter(R_S, kv)
     f_Rn = np.real(np.fft.ifftn(GF * np.fft.fftn(f)))
@@ -154,19 +142,16 @@ def smooth_loggauss(f, R_S, kv):
     """
     apply a Gaussian filter to the log of a field f.
 
-    Parameters
-    ----------
-    f : array
-        The field to be smoothed.
-    R_S : float
-        The smoothing scale.
-    kv : tuple
-        The wavevectors in each dimension.
+    Args:
+        f (:obj:`3D float np.ndarray`):
+            The field to be smoothed.
+        R_S (:obj:`float`):
+            The smoothing scale in units of voxels.
+        kv (:obj:`tuple`):
+            The wavevectors in each dimension.
 
-    Returns
-    -------
-    f_Rn : array
-        The smoothed field.
+    Returns:
+        (:obj:`3D float np.ndarray`): The smoothed field.
     """
     # Get filter in Fourier space
     GF = kspace_gaussian_filter(R_S, kv)
