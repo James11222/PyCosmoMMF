@@ -167,14 +167,14 @@ def calc_structure_bools(
         msg = "make sure that you are not inputing the overdensity field δ = ρ/<ρ> - 1, but rather δ + 1 = ρ/<ρ>."
         raise ValueError(msg)
 
-    # Check if the input density_cube is actually δ + 1 = ρ/<ρ> or just ρ
-    if np.mean(density_cube) != 1.0:
-        # If the mean is greater than 1, we assume it is simply ρ, but we want to transform to δ + 1 = ρ/<ρ>
-        if verbose_flag:  # pragma: no cover
-            print(
-                "Input density_cube is in density units, transforming to δ + 1 = ρ/<ρ>."
-            )
-        density_cube /= np.mean(density_cube)  # normalize to mean = 1
+    # # Check if the input density_cube is actually δ + 1 = ρ/<ρ> or just ρ
+    # if np.mean(density_cube) != 1.0:
+    #     # If the mean is greater than 1, we assume it is simply ρ, but we want to transform to δ + 1 = ρ/<ρ>
+    #     if verbose_flag:  # pragma: no cover
+    #         print(
+    #             "Input density_cube is in density units, transforming to δ + 1 = ρ/<ρ>."
+    #         )
+    #     density_cube /= np.mean(density_cube)  # normalize to mean = 1
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     #                 Step 1. Create Cluster bool Filter
