@@ -19,14 +19,14 @@ def test_maximum_signature():
     sigs = m.maximum_signature(Rs, field, algorithm="NEXUSPLUS")
     assert sigs.shape == (32, 32, 32, 3)
 
-    sigs = m.maximum_signature(Rs, field, algorithm="NEXUS")
+    sigs = m.maximum_signature(Rs, field, algorithm="NEXUS_DEN")
     assert sigs.shape == (32, 32, 32, 3)
 
 
 def test_calc_structure_bools():
     Rs = [np.sqrt(2) ** n for n in range(5)]
     field = test_field
-    sigs = m.maximum_signature(Rs, field, algorithm="NEXUS")
+    sigs = m.maximum_signature(Rs, field, algorithm="NEXUS_DEN")
     clusbool = (
         np.roll(m.sphere(32, 2), -10, axis=0) + np.roll(m.sphere(32, 2), 10, axis=0)
     ) >= 1

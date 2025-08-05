@@ -78,7 +78,9 @@ def test_fast_hessian_from_smoothed():
     kx, ky, kz = m.wavevectors3D(dims, box_size)
     f = test_field
     f_smooth = m.smooth_gauss(f, R_S, (kx, ky, kz))
-    hessian = m.fast_hessian_from_smoothed(f_smooth, R_S, (kx, ky, kz))
+    hessian = m.fast_hessian_from_smoothed(
+        f_smooth, R_S, (kx, ky, kz), algorithm="NEXUSPLUS"
+    )
     assert hessian.shape == (32, 32, 32, 6)
     for i in range(6):
         assert np.all(hessian[:, :, :, i] != 0.0)
@@ -91,7 +93,9 @@ def test_signatures_from_hessian():
     kx, ky, kz = m.wavevectors3D(dims, box_size)
     f = test_field
     f_smooth = m.smooth_gauss(f, R_S, (kx, ky, kz))
-    hessian = m.fast_hessian_from_smoothed(f_smooth, R_S, (kx, ky, kz))
+    hessian = m.fast_hessian_from_smoothed(
+        f_smooth, R_S, (kx, ky, kz), algorithm="NEXUSPLUS"
+    )
     sigs = m.signatures_from_hessian(hessian)
     assert sigs.shape == (32, 32, 32, 3)
 
