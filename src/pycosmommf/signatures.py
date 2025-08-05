@@ -78,7 +78,7 @@ def signatures_from_hessian(hessian):  # pragma: no cover
     return sigs
 
 
-def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-8):
+def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16):
     """
     Compute the maximum signatures across all scales Rs.
 
@@ -90,7 +90,7 @@ def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-8):
         algorithm (:obj:`str`, optional):
             The algorithm to use for smoothing. Can be either "NEXUS" or "NEXUSPLUS". Defaults to "NEXUSPLUS".
         eps (:obj:`float`, optional):
-            Small value to avoid division by zero. Defaults to ``1e-8``.
+            Small value to avoid division by zero. Defaults to ``1e-16``.
 
     Returns:
         (:obj:`4D float np.ndarray`):
