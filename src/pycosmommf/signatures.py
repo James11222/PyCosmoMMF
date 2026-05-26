@@ -78,7 +78,7 @@ def signatures_from_hessian(hessian):  # pragma: no cover
     return sigs
 
 
-def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16):
+def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16, backend="cpu"):
     """
     Compute the maximum signatures across all scales Rs.
 
@@ -91,6 +91,10 @@ def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16):
             The algorithm to use for smoothing. Can be either "NEXUS" or "NEXUSPLUS". Defaults to "NEXUSPLUS".
         eps (:obj:`float`, optional):
             Small value to avoid division by zero. Defaults to ``1e-16``.
+        backend (:obj:`str`, optional):
+            Computational backend. ``"cpu"`` uses the default NumPy/Numba path.
+            ``"jax"`` uses JAX and can run on GPU/TPU when available; requires
+            ``pip install 'pycosmommf[jax]'``. Defaults to ``"cpu"``.
 
     Returns:
         (:obj:`4D float np.ndarray`):
@@ -101,6 +105,15 @@ def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16):
     if algorithm not in ["NEXUS", "NEXUSPLUS"]:  # pragma: no cover
         msg = "algorithm must be either 'NEXUS' or 'NEXUSPLUS'"
         raise ValueError(msg)
+
+    if backend not in ["cpu", "jax"]:
+        msg = "backend must be either 'cpu' or 'jax'"
+        raise ValueError(msg)
+
+    if backend == "jax":
+        from ._jax_backend import maximum_signature_jax
+
+        return maximum_signature_jax(Rs, density_cube, algorithm=algorithm, eps=eps)
 
     nx, ny, nz = density_cube.shape
 
