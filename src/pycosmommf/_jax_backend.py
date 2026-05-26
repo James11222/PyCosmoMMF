@@ -10,6 +10,9 @@ rest of the package (tagging, etc.) remains unchanged.
 
 from __future__ import annotations
 
+import contextlib
+import warnings
+
 import numpy as np
 
 
@@ -25,6 +28,33 @@ def _jnp():
             "Install it with:  pip install 'pycosmommf[jax]'"
         )
         raise ImportError(msg) from e
+
+
+def _cpu_device_context():
+    """Return a context manager that forces JAX to run on CPU.
+
+    jax-metal (Apple Silicon) does not support complex-number operations or
+    FFT, which this pipeline requires throughout. When Metal is the default
+    backend we automatically fall back to the CPU device so the JAX backend
+    remains usable on macOS. A one-time warning is emitted.
+    """
+    try:
+        import jax
+
+        default = jax.devices()[0]
+        # Metal devices report as 'METAL' or contain 'metal' in their string repr
+        if "metal" in str(default).lower() or "METAL" in str(type(default)):
+            warnings.warn(
+                "jax-metal does not support FFT/complex operations required by "
+                "this pipeline. Falling back to JAX on CPU automatically. "
+                "To silence this warning set backend='cpu'.",
+                stacklevel=3,
+            )
+            cpu_devices = jax.devices("cpu")
+            return jax.default_device(cpu_devices[0])
+    except Exception:
+        pass
+    return contextlib.nullcontext()
 
 
 # ---------------------------------------------------------------------------
@@ -251,19 +281,21 @@ def maximum_signature_jax(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16):
     jnp = _jnp()
 
     nx, ny, nz = density_cube.shape
-    field = jnp.asarray(density_cube, dtype=jnp.float32) + eps
 
-    wave_vecs = wavevectors3D((nx, ny, nz))
-    sigmax = jnp.ones((nx, ny, nz, 3), dtype=jnp.float32) * eps
+    with _cpu_device_context():
+        field = jnp.asarray(density_cube, dtype=jnp.float32) + eps
 
-    for R in Rs:
-        if algorithm == "NEXUS":
-            f_Rn = smooth_gauss_jax(field, R, wave_vecs)
-        else:
-            f_Rn = smooth_loggauss_jax(field, R, wave_vecs)
+        wave_vecs = wavevectors3D((nx, ny, nz))
+        sigmax = jnp.ones((nx, ny, nz, 3), dtype=jnp.float32) * eps
 
-        H_Rn = fast_hessian_from_smoothed_jax(f_Rn, R, wave_vecs)
-        sigs_Rn = signatures_from_hessian_jax(H_Rn)
-        sigmax = jnp.maximum(sigmax, sigs_Rn)
+        for R in Rs:
+            if algorithm == "NEXUS":
+                f_Rn = smooth_gauss_jax(field, R, wave_vecs)
+            else:
+                f_Rn = smooth_loggauss_jax(field, R, wave_vecs)
 
-    return np.asarray(sigmax)
+            H_Rn = fast_hessian_from_smoothed_jax(f_Rn, R, wave_vecs)
+            sigs_Rn = signatures_from_hessian_jax(H_Rn)
+            sigmax = jnp.maximum(sigmax, sigs_Rn)
+
+        return np.asarray(sigmax)

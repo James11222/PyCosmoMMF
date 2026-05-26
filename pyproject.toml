@@ -78,6 +78,7 @@ addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "error",
+  "ignore:jax-metal does not support FFT:UserWarning",
 ]
 log_cli_level = "INFO"
 testpaths = [
