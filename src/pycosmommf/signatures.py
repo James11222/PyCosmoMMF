@@ -78,6 +78,31 @@ def signatures_from_hessian(hessian):  # pragma: no cover
     return sigs
 
 
+def _validate_density_for_algorithm(density_cube, algorithm):
+    """
+    Raise ``ValueError`` if ``density_cube`` is not a valid input for the
+    chosen ``algorithm``. Specifically, ``"NEXUSPLUS"`` takes ``log10`` of
+    the density, so the input must be strictly positive — passing an
+    overdensity δ (which is negative in voids) silently produces NaN
+    throughout the pipeline. This check converts that failure mode into a
+    clear, immediate error.
+
+    ``"NEXUS"`` does not log-transform the field and so accepts any
+    finite values.
+    """
+    if algorithm == "NEXUSPLUS" and np.any(density_cube < 0):
+        n_neg = int(np.sum(density_cube < 0))
+        min_val = float(np.min(density_cube))
+        msg = (
+            "NEXUSPLUS uses log10(density) and requires a strictly positive "
+            f"density field. Got {n_neg} negative voxels (min = {min_val:.4g}). "
+            "If you passed an overdensity δ = ρ/⟨ρ⟩ - 1, convert it to "
+            "δ+1 = ρ/⟨ρ⟩ by adding 1 before calling: "
+            "maximum_signature(Rs, density + 1, ...)."
+        )
+        raise ValueError(msg)
+
+
 def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16, backend="cpu"):
     """
     Compute the maximum signatures across all scales Rs.
@@ -86,7 +111,9 @@ def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16, backen
         Rs (:obj:`list` of :obj:`float`):
             List of smoothing scales in units of voxels.
         density_cube (:obj:`3D float np.ndarray`):
-            The 3D density field to analyze.
+            The 3D density field to analyze. For ``algorithm="NEXUSPLUS"``
+            this must be strictly positive (i.e. ``δ+1 = ρ/⟨ρ⟩``); a
+            ``ValueError`` is raised otherwise.
         algorithm (:obj:`str`, optional):
             The algorithm to use for smoothing. Can be either "NEXUS" or "NEXUSPLUS". Defaults to "NEXUSPLUS".
         eps (:obj:`float`, optional):
@@ -109,6 +136,8 @@ def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16, backen
     if backend not in ["cpu", "jax"]:
         msg = "backend must be either 'cpu' or 'jax'"
         raise ValueError(msg)
+
+    _validate_density_for_algorithm(density_cube, algorithm)
 
     if backend == "jax":
         from ._jax_backend import maximum_signature_jax

@@ -71,3 +71,24 @@ def test_calc_structure_bools():
             Smax=2,
             overdensity_threshold=370,
         )
+
+
+def test_maximum_signature_nexusplus_rejects_negative_input():
+    """
+    NEXUSPLUS smooths log10(density), so negative input would silently
+    produce NaN throughout the pipeline. The validation should turn that
+    into a clear ValueError, regardless of backend.
+    """
+    Rs = [np.sqrt(2) ** n for n in range(3)]
+    delta = test_field / np.mean(test_field) - 1.0  # has negative voxels
+
+    with pytest.raises(ValueError, match="NEXUSPLUS"):
+        m.maximum_signature(Rs, delta, algorithm="NEXUSPLUS", backend="cpu")
+
+
+def test_maximum_signature_nexus_allows_negative_input():
+    """NEXUS does not log-transform, so negative input is fine."""
+    Rs = [np.sqrt(2) ** n for n in range(3)]
+    delta = test_field / np.mean(test_field) - 1.0
+    sigs = m.maximum_signature(Rs, delta, algorithm="NEXUS", backend="cpu")
+    assert sigs.shape == delta.shape + (3,)
