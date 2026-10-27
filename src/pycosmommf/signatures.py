@@ -9,6 +9,87 @@ from .hessian import fast_hessian_from_smoothed
 jit_compiler = nb.njit(parallel=True, fastmath=True)
 
 
+@nb.njit(fastmath=True, inline="always")
+def _eigvalsh_3x3_sym(a, b, c, d, e, f):  # pragma: no cover
+    """
+    Eigenvalues of the real symmetric 3×3 matrix
+
+        [[a, b, c],
+         [b, d, e],
+         [c, e, f]]
+
+    for scalar entries. Returns ``(e_min, e_mid, e_max)`` sorted ascending,
+    as float32.
+
+    Uses the closed-form trigonometric solution of Smith (1961)
+    (Communications of the ACM 4, 168). This is the same solver as
+    ``_jax_backend._eigvalsh_3x3_sym``, so both backends share one
+    eigenvalue method. All arithmetic is done in float32 to match the JAX
+    backend.
+
+    Numerical notes:
+      * The matrix is rescaled by its max-abs element before the trig
+        formula runs, which keeps the determinant-over-p³ quotient
+        well-conditioned for near-zero Hessians.
+      * The argument to ``arccos`` is clipped to [-1, 1].
+      * The all-zero matrix and the scalar*I case are short-circuited.
+    """
+    one = np.float32(1.0)
+    two = np.float32(2.0)
+    three = np.float32(3.0)
+    six = np.float32(6.0)
+    zero = np.float32(0.0)
+
+    a = np.float32(a)
+    b = np.float32(b)
+    c = np.float32(c)
+    d = np.float32(d)
+    e = np.float32(e)
+    f = np.float32(f)
+
+    scale = max(abs(a), abs(d), abs(f), abs(b), abs(c), abs(e))
+    if scale == zero:
+        return zero, zero, zero
+    inv_scale = one / scale
+
+    a_s = a * inv_scale
+    b_s = b * inv_scale
+    c_s = c * inv_scale
+    d_s = d * inv_scale
+    e_s = e * inv_scale
+    f_s = f * inv_scale
+
+    p1 = b_s * b_s + c_s * c_s + e_s * e_s
+    q = (a_s + d_s + f_s) / three
+    a_q = a_s - q
+    d_q = d_s - q
+    f_q = f_s - q
+    p2 = a_q * a_q + d_q * d_q + f_q * f_q + two * p1
+    p = np.sqrt(p2 / six)
+
+    if p == zero:
+        eig = q * scale
+        return eig, eig, eig
+
+    det_shifted = (
+        a_q * (d_q * f_q - e_s * e_s)
+        - b_s * (b_s * f_q - e_s * c_s)
+        + c_s * (b_s * e_s - d_q * c_s)
+    )
+
+    r = det_shifted / (two * p * p * p)
+    r = min(max(r, -one), one)
+
+    phi = np.arccos(r) / three
+    two_p = two * p
+    eig_max = q + two_p * np.cos(phi)
+    eig_min = q + two_p * np.cos(phi + np.float32(2.0 * np.pi / 3.0))
+    # Trace conservation gives the middle eigenvalue without another trig call.
+    eig_mid = three * q - eig_max - eig_min
+
+    return eig_min * scale, eig_mid * scale, eig_max * scale
+
+
 @jit_compiler
 def signatures_from_hessian(hessian):  # pragma: no cover
     """
@@ -48,15 +129,14 @@ def signatures_from_hessian(hessian):  # pragma: no cover
     for i in nb.prange(hsize[0]):
         for j in range(hsize[1]):
             for k in range(hsize[2]):
-                hes_slice = np.array(
-                    [
-                        [hessian[i, j, k, 0], hessian[i, j, k, 1], hessian[i, j, k, 2]],
-                        [hessian[i, j, k, 1], hessian[i, j, k, 3], hessian[i, j, k, 4]],
-                        [hessian[i, j, k, 2], hessian[i, j, k, 4], hessian[i, j, k, 5]],
-                    ]
+                e1, e2, e3 = _eigvalsh_3x3_sym(
+                    hessian[i, j, k, 0],
+                    hessian[i, j, k, 1],
+                    hessian[i, j, k, 2],
+                    hessian[i, j, k, 3],
+                    hessian[i, j, k, 4],
+                    hessian[i, j, k, 5],
                 )
-
-                e1, e2, e3 = np.sort(np.real(np.linalg.eigvals(hes_slice)))
 
                 if e1 == 0:
                     sigs[i, j, k, 0] = 0
