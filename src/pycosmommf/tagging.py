@@ -4,6 +4,9 @@ import numba as nb
 import numpy as np
 import skimage.measure
 
+# Values of the uint8 ``structure_filter`` returned by ``calc_structure_bools()``.
+_CLUSTER, _FILAMENT, _WALL, _VOID = 1, 2, 3, 4
+
 
 def _cluster_signature_thresholds():
     """The float32 cluster-signature thresholds scanned by ``make_the_clusbool()``."""
@@ -201,7 +204,7 @@ def _structure_bools_cpu(
 ):
     """
     NumPy implementation of ``calc_structure_bools()``. Returns a dict with
-    the four boolean filters, the thresholds and curves behind them and,
+    the uint8 ``structure_filter``, the thresholds and curves behind it and,
     when ``verbose_flag`` is set, the volume and mass fractions.
     """
     density_cube = np.asarray(density_cube, dtype=np.float32)
@@ -261,16 +264,17 @@ def _structure_bools_cpu(
     wallbool = (max_sigs[:, :, :, 2] > wall_thresh) & ~(filbool | clusbool)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    #                   Step 4. Create Void bool Filter
+    #       Step 4. Voids are everything else; build the structure filter
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    voidbool = (clusbool + filbool + wallbool) == 0
+    # The three boolean filters are mutually exclusive by construction.
+    structure_filter = np.full(density_cube.shape, _VOID, dtype=np.uint8)
+    structure_filter[wallbool] = _WALL
+    structure_filter[filbool] = _FILAMENT
+    structure_filter[clusbool] = _CLUSTER
 
     result = {
-        "clusbool": clusbool,
-        "filbool": filbool,
-        "wallbool": wallbool,
-        "voidbool": voidbool,
+        "structure_filter": structure_filter,
         "cluster_thresh": cluster_thresh,
         "S_clus": S_clus,
         "f_vir_clus": f_vir_clus,
@@ -283,7 +287,7 @@ def _structure_bools_cpu(
     }
 
     if verbose_flag:
-        masks = (clusbool, filbool, wallbool, voidbool)
+        masks = [structure_filter == k for k in (_CLUSTER, _FILAMENT, _WALL, _VOID)]
         total_mass = np.sum(density_cube)
         result["volume_fractions"] = [
             np.float32(np.count_nonzero(b)) / np.float32(N_cells) for b in masks
@@ -365,7 +369,7 @@ def calc_structure_bools(
     backend="cpu",
 ):
     """
-    Calculate the boolean filters for clusters, filaments, walls, and voids.
+    Tag every voxel as a cluster, filament, wall or void.
 
     Args:
         density_cube (:obj:`3D float np.ndarray`):
@@ -390,20 +394,22 @@ def calc_structure_bools(
             and ``clusbool`` may also be CuPy arrays or JAX GPU arrays (for
             example the output of ``maximum_signature(..., backend="gpu",
             return_numpy=False)``), which are used in place without a copy.
-            Both backends compute in float32 and return NumPy arrays; their
-            filters agree up to float32 summation-order differences. Defaults
+            Both backends compute in float32 and return a NumPy array; their
+            results agree up to float32 summation-order differences. Defaults
             to ``"cpu"``.
 
     If no clump is virialized at any cluster-signature threshold, the grid is
-    too coarse to resolve clusters: a warning is printed and ``clusbool`` is
-    empty.
+    too coarse to resolve clusters: a warning is printed and no voxel is
+    tagged as a cluster.
 
     Returns:
-        (tuple): a tuple containing:
-            - **clusbool** (:obj:`3D bool np.ndarray`): the cluster boolean filter
-            - **filbool** (:obj:`3D bool np.ndarray`): the filament boolean filter
-            - **wallbool** (:obj:`3D bool np.ndarray`): the wall boolean filter
-            - **voidbool** (:obj:`3D bool np.ndarray`): the void boolean filter
+        **structure_filter** (:obj:`3D uint8 np.ndarray`) when ``verbose_flag = False``,
+        otherwise the tuple ``(structure_filter, summary_data)``:
+            - **structure_filter** (:obj:`3D uint8 np.ndarray`): the structure
+              type of every voxel: ``1`` = cluster, ``2`` = filament,
+              ``3`` = wall, ``4`` = void. Every voxel gets exactly one type,
+              so there are no zeros. For example ``structure_filter == 2``
+              selects the filaments.
             - **summary_data** (:obj:`dict`): a dictionary returned only when ``verbose_flag = True``, it contains the following keys:
                 - **S_clus** (:obj:`1D float32 np.ndarray`): the signature values for clusters
                 - **f_vir_clus** (:obj:`1D float32 np.ndarray`): the virialization fraction for clusters
@@ -444,14 +450,7 @@ def calc_structure_bools(
             overdensity_threshold,
         )
 
-    bools = (
-        result["clusbool"],
-        result["filbool"],
-        result["wallbool"],
-        result["voidbool"],
-    )
-
     if verbose_flag:
-        return (*bools, _report_and_summarize(result))
+        return result["structure_filter"], _report_and_summarize(result)
 
-    return bools
+    return result["structure_filter"]

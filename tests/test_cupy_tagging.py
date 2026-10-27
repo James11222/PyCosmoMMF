@@ -60,11 +60,13 @@ def _assert_same_tagging(cpu_out, gpu_out):
     different order, so curves and fractions agree to float32 precision and a
     voxel sitting exactly on a threshold may in principle flip.
     """
-    for cpu_bool, gpu_bool in zip(cpu_out[:4], gpu_out[:4]):
-        assert gpu_bool.dtype == np.bool_
-        assert np.count_nonzero(cpu_bool != gpu_bool) <= 1e-4 * cpu_bool.size
-    if len(cpu_out) == 5:
-        cpu_sum, gpu_sum = cpu_out[4], gpu_out[4]
+    verbose = isinstance(cpu_out, tuple)
+    cpu_filter, gpu_filter = (cpu_out[0], gpu_out[0]) if verbose else (cpu_out, gpu_out)
+    assert gpu_filter.dtype == np.uint8
+    assert np.count_nonzero(gpu_filter == 0) == 0
+    assert np.count_nonzero(cpu_filter != gpu_filter) <= 1e-4 * cpu_filter.size
+    if verbose:
+        cpu_sum, gpu_sum = cpu_out[1], gpu_out[1]
         for key in ("S_clus", "f_vir_clus", "S_fil", "S_fil_thresh", "S_wall"):
             np.testing.assert_array_equal(cpu_sum[key], gpu_sum[key])
         assert cpu_sum["S_wall_thresh"] == gpu_sum["S_wall_thresh"]
@@ -158,8 +160,9 @@ def test_calc_structure_bools_cupy_rejects_overdensity():
 
 def test_calc_structure_bools_gpu_unresolved_clusters_is_empty(capsys):
     # A huge overdensity threshold: no clump is virialized at any threshold.
-    out = m.calc_structure_bools(
+    structure_filter = m.calc_structure_bools(
         _density, _sigs, False, overdensity_threshold=1e9, backend="gpu"
     )
-    assert not out[0].any()
+    assert not (structure_filter == 1).any()
+    assert set(np.unique(structure_filter)) <= {2, 3, 4}
     assert "not sufficiently high to resolve virialized" in capsys.readouterr().out

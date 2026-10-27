@@ -60,8 +60,11 @@ def test_float32_throughout():
     sigs = m.maximum_signature([1.0, 2.0], density, algorithm="NEXUSPLUS")
     assert sigs.dtype == np.float32
 
-    out = m.calc_structure_bools(density, sigs.astype(np.float64), True)
-    for value in out[4].values():
+    structure_filter, summary = m.calc_structure_bools(
+        density, sigs.astype(np.float64), True
+    )
+    assert structure_filter.dtype == np.uint8
+    for value in summary.values():
         if isinstance(value, list):
             assert all(isinstance(v, np.float32) for v in value)
         elif value is not None:
@@ -145,17 +148,16 @@ def test_calc_structure_bools_finds_clusters(verbose_flag):
     sigs = m.maximum_signature(Rs, density, algorithm="NEXUSPLUS")
 
     out = m.calc_structure_bools(density, sigs, verbose_flag=verbose_flag)
-    clusbool, filbool, wallbool, voidbool = out[:4]
+    structure_filter = out[0] if verbose_flag else out
 
-    total = (
-        clusbool.astype(int)
-        + filbool.astype(int)
-        + wallbool.astype(int)
-        + voidbool.astype(int)
-    )
-    assert np.all(total == 1)  # every voxel gets exactly one tag
+    assert structure_filter.dtype == np.uint8
+    assert structure_filter.shape == density.shape
+    # every voxel gets exactly one tag: 1 cluster, 2 filament, 3 wall, 4 void
+    assert set(np.unique(structure_filter)) == {1, 2, 3, 4}
     if verbose_flag:
-        summary = out[4]
+        summary = out[1]
+        volume = [np.mean(structure_filter == k) for k in (1, 2, 3, 4)]
+        np.testing.assert_allclose(summary["volume_fractions"], volume, rtol=1e-6)
         np.testing.assert_allclose(sum(summary["volume_fractions"]), 1.0)
         np.testing.assert_allclose(sum(summary["mass_fractions"]), 1.0, rtol=1e-5)
 

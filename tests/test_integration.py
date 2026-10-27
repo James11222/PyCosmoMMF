@@ -30,7 +30,7 @@ def test_calc_structure_bools():
     clusbool = (
         np.roll(m.sphere(32, 2), -10, axis=0) + np.roll(m.sphere(32, 2), 10, axis=0)
     ) >= 1
-    clusbool, filbool, wallbool, voidbool, summary_stats = m.calc_structure_bools(
+    structure_filter, summary_stats = m.calc_structure_bools(
         field,
         max_sigs=sigs,
         verbose_flag=True,
@@ -39,13 +39,13 @@ def test_calc_structure_bools():
         Smax=2,
         overdensity_threshold=370,
     )
-    assert clusbool.shape == (32, 32, 32)
-    assert filbool.shape == (32, 32, 32)
-    assert wallbool.shape == (32, 32, 32)
-    assert voidbool.shape == (32, 32, 32)
+    assert structure_filter.shape == (32, 32, 32)
+    assert structure_filter.dtype == np.uint8
+    assert set(np.unique(structure_filter)) <= {1, 2, 3, 4}
+    np.testing.assert_array_equal(structure_filter == 1, clusbool)
     assert type(summary_stats) is dict
 
-    clusbool, filbool, wallbool, voidbool = m.calc_structure_bools(
+    structure_filter_quiet = m.calc_structure_bools(
         field,
         max_sigs=sigs,
         verbose_flag=False,
@@ -54,15 +54,12 @@ def test_calc_structure_bools():
         Smax=2,
         overdensity_threshold=370,
     )
-    assert clusbool.shape == (32, 32, 32)
-    assert filbool.shape == (32, 32, 32)
-    assert wallbool.shape == (32, 32, 32)
-    assert voidbool.shape == (32, 32, 32)
+    np.testing.assert_array_equal(structure_filter_quiet, structure_filter)
 
     delta = field / np.mean(field) - 1.0
 
     with pytest.raises(ValueError):  # noqa: PT011
-        clusbool, filbool, wallbool, voidbool = m.calc_structure_bools(
+        m.calc_structure_bools(
             density_cube=delta,
             max_sigs=sigs,
             verbose_flag=False,

@@ -46,6 +46,10 @@ import warnings
 import numpy as np
 
 from .tagging import (
+    _CLUSTER,
+    _FILAMENT,
+    _VOID,
+    _WALL,
     _check_not_overdensity,
     _cluster_signature_thresholds,
     _log10S_grid,
@@ -180,6 +184,18 @@ def _clump_sums_kernel():
     )
 
 
+@functools.lru_cache(maxsize=None)
+def _structure_filter_kernel():
+    """uint8 structure type per voxel from the (mutually exclusive) cluster, filament and wall masks."""
+    cp = _cp()
+    return cp.ElementwiseKernel(
+        "bool c, bool f, bool w",
+        "uint8 s",
+        f"s = c ? {_CLUSTER} : (f ? {_FILAMENT} : (w ? {_WALL} : {_VOID}))",
+        "pycosmommf_structure_filter",
+    )
+
+
 def _make_the_clusbool_cupy(delta, cluster_signature, overdensity_threshold):
     """
     GPU version of ``tagging.make_the_clusbool``. ``delta`` is the δ field and
@@ -249,8 +265,8 @@ def structure_bools_cupy(
 ):
     """
     CuPy implementation of ``calc_structure_bools()``. Returns the same dict
-    as ``tagging._structure_bools_cpu``, with the boolean filters copied back
-    to NumPy.
+    as ``tagging._structure_bools_cpu``, with the structure filter copied
+    back to NumPy.
     """
     cp = _cp()
 
@@ -294,10 +310,10 @@ def structure_bools_cupy(
         wall_thresh = S_wall[np.argmax(dM2_wall)]
         wallbool = (wall_signature > wall_thresh) & ~(filbool | clusbool)
 
-        # Step 4. Void bool Filter
-        voidbool = ~(clusbool | filbool | wallbool)
+        # Step 4. Voids are everything else; build the structure filter
+        structure_filter = _structure_filter_kernel()(clusbool, filbool, wallbool)
+        del clusbool, filbool, wallbool
 
-        masks = (clusbool, filbool, wallbool, voidbool)
         result = {
             "cluster_thresh": cluster_thresh,
             "S_clus": S_clus,
@@ -311,6 +327,7 @@ def structure_bools_cupy(
         }
 
         if verbose_flag:
+            masks = [structure_filter == k for k in (_CLUSTER, _FILAMENT, _WALL, _VOID)]
             masked_mass = _masked_mass_kernel()
             total_mass = np.float32(cp.sum(rho).get())
             result["volume_fractions"] = [
@@ -321,7 +338,6 @@ def structure_bools_cupy(
                 _full_sum(masked_mass, b, rho) / total_mass for b in masks
             ]
 
-        for name, b in zip(("clusbool", "filbool", "wallbool", "voidbool"), masks):
-            result[name] = cp.asnumpy(b)
+        result["structure_filter"] = cp.asnumpy(structure_filter)
 
     return result
