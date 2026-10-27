@@ -156,3 +156,7 @@ Thumbs.db
 # Common editor files
 *~
 *.swp
+
+# AGENTS
+CLAUDE.md 
+AGENTS.md
