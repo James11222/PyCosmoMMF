@@ -13,6 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pip install -e ".[dev]"
 # add the JAX backend (needed for tests/test_jax_backend.py to run instead of skip):
 pip install -e ".[dev,jax]"
+# add the CuPy tagging backend (needed for tests/test_cupy_tagging.py; also needs a CUDA GPU):
+pip install -e ".[dev,cupy]"
 ```
 
 **Run tests:**
@@ -57,7 +59,7 @@ density_cube (3D float32, δ+1 = ρ/<ρ>)
            ├─ hessian.py: fast_hessian_from_smoothed      (6-component symmetric Hessian)
            ├─ signatures.py: signatures_from_hessian      (cluster/filament/wall scores)
            └─ returns sigmax (nx, ny, nz, 3)  — max over all scales
-    └─ calc_structure_bools(density_cube, max_sigs, verbose_flag, ...)
+    └─ calc_structure_bools(density_cube, max_sigs, verbose_flag, ..., backend)
            ├─ make_the_clusbool()  — virialization-based cluster threshold
            ├─ calc_mass_change()   — dM²/dlog(S) curve for filament/wall thresholds
            └─ returns (clusbool, filbool, wallbool, voidbool[, summary_data])
@@ -68,12 +70,12 @@ density_cube (3D float32, δ+1 = ρ/<ρ>)
 - **`filter.py`** — k-space Gaussian, log-Gaussian, and top-hat smoothing. `wavevectors3D()` builds the wavevector arrays required by all downstream functions. Numba JIT (`njit(parallel=True, fastmath=True)`) used for the inner filter loops.
 - **`hessian.py`** — computes the scaled Hessian in k-space (6 independent components stored as index 0–5: xx, xy, xz, yy, yz, zz), then IFFTs back. The inner loop is a closure JIT-compiled inside `fast_hessian_from_smoothed`.
 - **`signatures.py`** — `signatures_from_hessian()` computes sorted eigenvalues (e1 ≤ e2 ≤ e3) per voxel with `_eigvalsh_3x3_sym`, a scalar Numba port of the JAX backend's analytic Smith-1961 solver (float32 arithmetic, max-abs rescaling), and applies Heaviside-based morphology scores. `maximum_signature()` orchestrates the multi-scale loop, taking the elementwise max across scales.
-- **`tagging.py`** — `calc_structure_bools()` sequences the three tagging steps. Cluster threshold uses virialization fraction (fraction of clumps with mean δ > `overdensity_threshold`); filament/wall thresholds use the peak of |dM²/dlog(S)|.
+- **`tagging.py`** — `calc_structure_bools()` sequences the three tagging steps. Cluster threshold uses virialization fraction (fraction of clumps with mean δ > `overdensity_threshold`); filament/wall thresholds use the peak of |dM²/dlog(S)|. Computation (`_structure_bools_cpu`) is separate from the printed report and `summary_data` (`_report_and_summarize`), which both backends share. Clumps are 26-connected (`skimage.measure.label(..., connectivity=3)`); per-clump δ sums use `np.bincount` in float64. Do not go back to a Numba `prange` loop with `+=` on per-clump arrays: it races and drops voxels. A threshold with no clumps gets a NaN virialized fraction and is skipped by `_select_cluster_threshold`.
 - **`utils.py`** — synthetic test geometry generators (`sphere`, `cylinder`, `wall`) and a block-sum `shrink` utility.
 
 ### JAX backend
 
-`maximum_signature()` accepts a `backend` parameter (default `"cpu"`). Setting `backend="jax"` routes the entire computation through `_jax_backend.py` (`maximum_signature_jax`). This module is **not** star-imported in `__init__.py`; it is reached only through the dispatcher, and JAX is imported lazily (via `_jax()` / `_jnp()`) so a missing install raises `ImportError` only when `backend="jax"` is used. Install with `pip install 'pycosmommf[jax]'`. The JAX backend always returns a plain `np.ndarray` so `calc_structure_bools()` is unchanged.
+`maximum_signature()` accepts a `backend` parameter (default `"cpu"`). Setting `backend="jax"` routes the entire computation through `_jax_backend.py` (`maximum_signature_jax`). This module is **not** star-imported in `__init__.py`; it is reached only through the dispatcher, and JAX is imported lazily (via `_jax()` / `_jnp()`) so a missing install raises `ImportError` only when `backend="jax"` is used. Install with `pip install 'pycosmommf[jax]'`. The JAX backend returns a plain `np.ndarray` by default; `return_numpy=False` returns the JAX array on the device instead, for `calc_structure_bools(..., backend="cupy")` to use without a copy.
 
 The hot path is designed around **GPU peak memory**, not a line-by-line port of the CPU code (see the module docstring for the full rationale):
 
@@ -86,6 +88,18 @@ The hot path is designed around **GPU peak memory**, not a line-by-line port of 
 Peak GPU memory is roughly 9–10× the scalar field size. At 1024³ XLA still needs ~65 GiB, so it requires an 80 GB GPU. Run it with `XLA_PYTHON_CLIENT_PREALLOCATE=false` and `XLA_PYTHON_CLIENT_ALLOCATOR=cuda_async`; the default BFC allocator fragments and OOMs.
 
 Both backends use the same Smith-1961 eigensolver, so keep `signatures._eigvalsh_3x3_sym` and `_jax_backend._eigvalsh_3x3_sym` in sync. JAX vs CPU outputs differ at float32 FFT precision (XLA vs NumPy FFT) and in float32 rounding of the trig formula. This gives ~10⁻⁴ relative differences in smoothing and up to ~10⁻³ absolute in final signatures, which does not affect structure tagging. Test tolerances in `tests/test_jax_backend.py` reflect this; do not tighten them without checking near-degenerate Hessian voxels.
+
+### CuPy tagging backend
+
+`calc_structure_bools()` accepts `backend="cpu"` (default) or `backend="cupy"`. The CuPy path lives in `_cupy_tagging.py` (`structure_bools_cupy`); like `_jax_backend.py` it is not star-imported and CuPy is imported lazily via `_cp()`. Install with `pip install 'pycosmommf[cupy]'` (`cupy-cuda12x`).
+
+- It mirrors `_structure_bools_cpu` step for step and imports the shared helpers from `tagging.py` (`_cast_threshold`, `_cluster_signature_thresholds`, `_select_cluster_threshold`, `_log10S_grid`, `_mass_change_curve`, `_check_not_overdensity`). Change those helpers, not copies, so the two backends keep giving identical filters.
+- Clumps: `cupyx.scipy.ndimage.label` with `structure=np.ones((3,3,3))` (26-connectivity), then `cupy.bincount` for per-clump sums and counts.
+- Mass curves: one fused float64 `ReductionKernel` per threshold, no masks or compacted copies.
+- Inputs may be NumPy (uploaded), CuPy, or JAX GPU arrays (shared through DLPack, zero copy). Outputs are always NumPy bools.
+- Memory: while tagging, CuPy allocates from CUDA's stream-ordered pool (`MemoryAsyncPool`, inside `_stream_ordered_allocator`). JAX's `cuda_async` allocator keeps freed memory in that pool, so this is what lets tagging reuse the memory `maximum_signature` freed in the same process. CuPy's default pool cannot. `MemoryAsyncPool` emits an "experimental" `FutureWarning`, which is suppressed where it is created.
+
+**Threshold comparisons:** every `signature > threshold` / `signature < threshold` in both backends goes through `_cast_threshold(t, dtype, op)`. It returns the largest float32 ≤ t (for `>`) or the smallest float32 ≥ t (for `<`), so float32 comparisons give the exact float64 answer. Without it, numpy 1.x compares in float32 after rounding t to nearest, while numpy 2.x compares in float64.
 
 ### Key conventions
 
@@ -100,6 +114,8 @@ Both backends use the same Smith-1961 eigensolver, so keep `signatures._eigvalsh
 
 - `tests/test_unit.py` — tests individual functions (filter, hessian, signatures, utils) with a 32³ synthetic field.
 - `tests/test_integration.py` — end-to-end tests of `maximum_signature` and `calc_structure_bools` including the `ValueError` path.
+- `tests/test_tagging.py` — CPU tagging: threshold casting, exact per-clump means on a large clump, NaN handling for thresholds without clumps, full `calc_structure_bools` with the cluster step.
+- `tests/test_cupy_tagging.py` — CuPy labelling vs skimage, and CuPy vs CPU tagging, which must give identical filters and thresholds, with NumPy, CuPy and JAX inputs. Skipped without CuPy or a CUDA GPU.
 - `tests/test_jax_backend.py` — JAX shape tests and JAX-vs-CPU agreement tests for each stage. The whole module uses `pytest.importorskip("jax")`, so it is **silently skipped** when JAX is not installed. CI installs only `.[test]` (no JAX), so these tests run only locally; install `.[jax]` before touching `_jax_backend.py`.
 - `tests/test_package.py` — basic package-level smoke tests.
 

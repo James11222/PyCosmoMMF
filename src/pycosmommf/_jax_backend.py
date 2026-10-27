@@ -517,7 +517,9 @@ def _make_scale_step(nx, ny, nz, kv_jax, algorithm, n_tiles):
     return jax.jit(step_impl, donate_argnums=(0,))
 
 
-def maximum_signature_jax(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16):
+def maximum_signature_jax(
+    Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16, return_numpy=True
+):
     """
     JAX implementation of ``maximum_signature()``.
 
@@ -527,8 +529,8 @@ def maximum_signature_jax(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16):
     and tiled along axis 0 so peak GPU memory stays at roughly 9–10× the
     scalar field size rather than the 25–30× of a naive implementation.
 
-    The output is converted back to a NumPy array before returning so the
-    result is a drop-in replacement for the CPU backend output.
+    By default the output is converted back to a NumPy array before returning
+    so the result is a drop-in replacement for the CPU backend output.
 
     Args:
         Rs (:obj:`list` of :obj:`float`):
@@ -540,9 +542,12 @@ def maximum_signature_jax(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16):
             to ``"NEXUSPLUS"``.
         eps (:obj:`float`, optional):
             Floor added to the field to avoid log(0). Defaults to ``1e-16``.
+        return_numpy (:obj:`bool`, optional):
+            ``False`` returns the JAX array on the device instead of copying
+            it to a NumPy array. Defaults to ``True``.
 
     Returns:
-        (:obj:`4D float32 np.ndarray`): Shape ``(N, N, N, 3)``.
+        (:obj:`4D float32 np.ndarray` or JAX array): Shape ``(N, N, N, 3)``.
 
     Raises:
         ValueError: If ``algorithm="NEXUSPLUS"`` and ``density_cube``
@@ -571,4 +576,4 @@ def maximum_signature_jax(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16):
         for R in Rs:
             sigmax = step(sigmax, field, float(R))
 
-        return np.asarray(sigmax)
+        return np.asarray(sigmax) if return_numpy else sigmax

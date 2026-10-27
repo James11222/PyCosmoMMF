@@ -183,7 +183,9 @@ def _validate_density_for_algorithm(density_cube, algorithm):
         raise ValueError(msg)
 
 
-def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16, backend="cpu"):
+def maximum_signature(
+    Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16, backend="cpu", return_numpy=True
+):
     """
     Compute the maximum signatures across all scales Rs.
 
@@ -202,6 +204,10 @@ def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16, backen
             Computational backend. ``"cpu"`` uses the default NumPy/Numba path.
             ``"jax"`` uses JAX and can run on GPU/TPU when available; requires
             ``pip install 'pycosmommf[jax]'``. Defaults to ``"cpu"``.
+        return_numpy (:obj:`bool`, optional):
+            Only used with ``backend="jax"``. ``False`` returns the result as a
+            JAX array that stays on the device, which ``calc_structure_bools(...,
+            backend="cupy")`` can use without a copy. Defaults to ``True``.
 
     Returns:
         (:obj:`4D float np.ndarray`):
@@ -222,7 +228,9 @@ def maximum_signature(Rs, density_cube, algorithm="NEXUSPLUS", eps=1e-16, backen
     if backend == "jax":
         from ._jax_backend import maximum_signature_jax
 
-        return maximum_signature_jax(Rs, density_cube, algorithm=algorithm, eps=eps)
+        return maximum_signature_jax(
+            Rs, density_cube, algorithm=algorithm, eps=eps, return_numpy=return_numpy
+        )
 
     nx, ny, nz = density_cube.shape
 

@@ -55,6 +55,9 @@ docs = [
 jax = [
   "jax>=0.4.0",
 ]
+cupy = [
+  "cupy-cuda12x",
+]
 
 [project.urls]
 Homepage = "https://github.com/James11222/pycosmommf"

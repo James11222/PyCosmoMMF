@@ -168,6 +168,14 @@ def test_maximum_signature_returns_numpy():
     assert isinstance(sigs, np.ndarray)
 
 
+def test_maximum_signature_return_numpy_false_keeps_jax_array():
+    sigs = m.maximum_signature(_Rs, _field, backend="jax", return_numpy=False)
+    assert isinstance(sigs, jax.Array)
+    np.testing.assert_array_equal(
+        np.asarray(sigs), m.maximum_signature(_Rs, _field, backend="jax")
+    )
+
+
 # ---------------------------------------------------------------------------
 # Invalid backend
 # ---------------------------------------------------------------------------
