@@ -33,7 +33,8 @@ dynamic = ["version"]
 dependencies = [
 "numba",
 "numpy>=1.22",
-"scikit-image"
+"scikit-image",
+"scipy",
 ]
 
 [project.optional-dependencies]
@@ -52,10 +53,8 @@ docs = [
   "sphinx_autodoc_typehints",
   "furo>=2023.08.17",
 ]
-jax = [
-  "jax>=0.4.0",
-]
-cupy = [
+gpu = [
+  "jax[cuda12]>=0.4.30",
   "cupy-cuda12x",
 ]
 

@@ -1,88 +1,68 @@
 from __future__ import annotations
 
+import numba as nb
 import numpy as np
 import skimage.measure
 
 
-def _cast_threshold(threshold, dtype, op):
-    """
-    Cast a float64 ``threshold`` to ``dtype`` so that comparing a ``dtype``
-    array against the cast value gives the exact float64 answer.
-
-    For a float32 value ``x`` and a float64 threshold ``t``, ``x > t`` is
-    equivalent to ``x > below`` where ``below`` is the largest float32
-    ``<= t``, and ``x < t`` is equivalent to ``x < above`` where ``above`` is
-    the smallest float32 ``>= t``. Comparing against the cast value keeps the
-    comparison in ``dtype`` (no float64 copy of the array) and makes the
-    result independent of numpy's scalar promotion rules, which differ
-    between numpy 1.x (compares in float32 with ``t`` rounded to nearest) and
-    numpy 2.x (compares in float64). Both tagging backends use this helper so
-    their masks agree voxel for voxel.
-
-    Args:
-        threshold (:obj:`float`):
-            The threshold value.
-        dtype (:obj:`numpy.dtype`):
-            The dtype of the array that will be compared against the threshold.
-        op (:obj:`str`):
-            ``">"`` or ``"<"``, the comparison the threshold will be used in.
-
-    Returns:
-        (:obj:`numpy scalar`): The threshold as a ``dtype`` scalar (or as a
-        float64 scalar when ``dtype`` is not a float type narrower than 64 bits).
-    """
-    dtype = np.dtype(dtype)
-    threshold = float(threshold)
-    if dtype.kind != "f" or dtype.itemsize >= 8:
-        return np.float64(threshold)
-    cast = dtype.type(threshold)
-    if op == ">" and float(cast) > threshold:
-        cast = np.nextafter(cast, dtype.type(-np.inf))
-    elif op == "<" and float(cast) < threshold:
-        cast = np.nextafter(cast, dtype.type(np.inf))
-    return cast
-
-
 def _cluster_signature_thresholds():
-    """The cluster-signature thresholds scanned by ``make_the_clusbool()``."""
-    return np.geomspace(0.1, 30, 10)  # hard coded for now
+    """The float32 cluster-signature thresholds scanned by ``make_the_clusbool()``."""
+    return np.geomspace(0.1, 30, 10, dtype=np.float32)  # hard coded for now
+
+
+@nb.njit
+def _clump_sums(labels, delta, n_clumps):  # pragma: no cover
+    """
+    float32 sum of ``delta`` and voxel count for each clump label ``1..n_clumps``
+    (``0`` is background). The loop is serial on purpose: a ``prange`` loop
+    with ``+=`` on the shared per-clump arrays races and drops voxels.
+    """
+    sums = np.zeros(n_clumps, dtype=np.float32)
+    counts = np.zeros(n_clumps, dtype=np.int64)
+    for i in range(labels.size):
+        label = labels[i]
+        if label != 0:
+            sums[label - 1] += delta[i]
+            counts[label - 1] += 1
+    return sums, counts
 
 
 def _clump_mean_overdensity(clumps, n_clumps, delta):
-    """
-    Mean δ of each labelled clump.
-
-    ``clumps`` holds labels ``1..n_clumps`` with ``0`` as background. Sums are
-    accumulated in float64 with ``np.bincount``, which is deterministic (the
-    previous Numba ``prange`` loop raced on the per-clump accumulators and
-    silently dropped voxels from clumps that spanned several threads).
-    """
-    labels = clumps.ravel()
-    counts = np.bincount(labels, minlength=n_clumps + 1)[1:]
-    sums = np.bincount(labels, weights=delta.ravel(), minlength=n_clumps + 1)[1:]
-    return sums / counts
+    """Mean δ (float32) of each labelled clump; ``clumps`` holds labels ``1..n_clumps``."""
+    sums, counts = _clump_sums(clumps.ravel(), delta.ravel(), n_clumps)
+    return sums / counts.astype(np.float32)
 
 
-def _virialized_fraction(mean_overdensity, overdensity_threshold):
-    """Fraction of clumps whose mean δ exceeds ``overdensity_threshold``; NaN if there are no clumps."""
-    if mean_overdensity.size == 0:
-        return np.nan
-    return np.sum(mean_overdensity > overdensity_threshold) / mean_overdensity.size
+def _virialized_fraction(n_virialized, n_clumps):
+    """Fraction of clumps that are virialized, as float32; NaN if there are no clumps."""
+    if n_clumps == 0:
+        return np.float32(np.nan)
+    return np.float32(n_virialized) / np.float32(n_clumps)
 
 
 def _select_cluster_threshold(signature_thresholds, virialized_fractions):
     """
     Pick the threshold whose virialized fraction is closest to 0.5.
 
-    Thresholds without any clumps have a NaN fraction and are skipped. If no
-    threshold has clumps, no voxel exceeds the lowest threshold, so the
-    resulting cluster filter is empty whichever threshold is returned; the
-    lowest one is used.
+    Thresholds without any clumps have a NaN fraction and are skipped. Returns
+    ``None`` when no clump is virialized at any threshold (every fraction is 0
+    or NaN): the grid does not resolve virialized structures, so there are no
+    clusters to tag.
     """
-    distance = np.abs(virialized_fractions - 0.5)
-    if np.all(np.isnan(distance)):
-        return signature_thresholds[0]
+    if not np.any(virialized_fractions > 0):
+        return None
+    distance = np.abs(virialized_fractions - np.float32(0.5))
     return signature_thresholds[np.nanargmin(distance)]
+
+
+def _warn_unresolved_clusters(overdensity_threshold):
+    """Tell the user why the cluster filter is empty."""
+    print(
+        "WARNING: no clump has a mean overdensity δ above "
+        f"{overdensity_threshold} at any cluster-signature threshold. The "
+        "resolution of the grid is not sufficiently high to resolve virialized "
+        "clusters/nodes of the cosmic web, so the cluster filter is empty."
+    )
 
 
 def make_the_clusbool(delta, max_sigs, overdensity_threshold):
@@ -92,13 +72,14 @@ def make_the_clusbool(delta, max_sigs, overdensity_threshold):
     this by finding a threshold value for 𝒮_cluster by looking at the
     change in virialization fraction as a function of 𝒮_cluster.
 
+    If no clump is virialized at any threshold, the grid does not resolve
+    clusters: a warning is printed, ``clusbool`` is empty and ``S_th`` is ``None``.
+
     Args:
         delta (:obj:`3D float np.ndarray`):
             delta refers to the (δ = ρ / <ρ> - 1) field, this is NOT the (δ + 1 = ρ / <ρ>) field.
         max_sigs (:obj:`4D float np.ndarray`):
             the maximum signatures array from the ``maximum_signature()`` function.
-        verbose_flag (:obj:`bool`):
-            a flag to allow the function to be more helpful and verbose.
         overdensity_threshold (:obj:`float`):
             The overdensity parameter threshold for determining virialization. Commonly used values
             that are physically motivated can be 370, 200, or 500.
@@ -106,20 +87,19 @@ def make_the_clusbool(delta, max_sigs, overdensity_threshold):
     Returns:
         (tuple): a tuple containing:
             - **clusbool** (:obj:`3D bool np.ndarray`): a boolean filter that selects only the clusters in a given cosmological δ field.
-            - **S_th** (:obj:`float`): the threshold value for 𝒮_cluster.
-            - **signature_thresholds** (:obj:`1D float np.ndarray`): an array of threshold values for 𝒮_cluster.
-            - **virialized_fractions** (:obj:`1D float np.ndarray`): an array of virialized fractions as a function of 𝒮_cluster. Thresholds with no clumps get NaN.
+            - **S_th** (:obj:`float32` or ``None``): the threshold value for 𝒮_cluster, ``None`` if no clump is virialized.
+            - **signature_thresholds** (:obj:`1D float32 np.ndarray`): an array of threshold values for 𝒮_cluster.
+            - **virialized_fractions** (:obj:`1D float32 np.ndarray`): an array of virialized fractions as a function of 𝒮_cluster. Thresholds with no clumps get NaN.
     """
+    delta = np.asarray(delta, dtype=np.float32)
+    cluster_signature = np.asarray(max_sigs[:, :, :, 0], dtype=np.float32)
 
     signature_thresholds = _cluster_signature_thresholds()
     virialized_fractions = np.zeros_like(signature_thresholds)
-    cluster_signature = max_sigs[:, :, :, 0]
 
     for i, S_th in enumerate(signature_thresholds):
         # Identify Clumps with S > S_th
-        _clusbool = cluster_signature > _cast_threshold(
-            S_th, cluster_signature.dtype, ">"
-        )
+        _clusbool = cluster_signature > S_th
 
         # 0 is background and 1, 2, 3, ... are the clumps (26-connected)
         clumps, n_clumps = skimage.measure.label(
@@ -130,18 +110,27 @@ def make_the_clusbool(delta, max_sigs, overdensity_threshold):
         )
 
         virialized_fractions[i] = _virialized_fraction(
-            averaged_overdensity_per_clump, overdensity_threshold
+            np.count_nonzero(averaged_overdensity_per_clump > overdensity_threshold),
+            n_clumps,
         )
 
     S_th = _select_cluster_threshold(signature_thresholds, virialized_fractions)
-    clusbool = cluster_signature > _cast_threshold(S_th, cluster_signature.dtype, ">")
+    if S_th is None:
+        _warn_unresolved_clusters(overdensity_threshold)
+        clusbool = np.zeros(cluster_signature.shape, dtype=bool)
+    else:
+        clusbool = cluster_signature > S_th
 
     return clusbool, S_th, signature_thresholds, virialized_fractions
 
 
 def _log10S_grid(Smin, Smax):
-    """The log10(𝒮) grid on which the mass change curves are evaluated."""
-    return np.arange(Smin, Smax + 0.1, 0.1)
+    """
+    The float32 log10(𝒮) grid on which the mass change curves are evaluated:
+    the points of ``np.arange(Smin, Smax + 0.1, 0.1)``, built in float32.
+    """
+    n = int(np.ceil(round((Smax + 0.1 - Smin) / 0.1, 6)))
+    return np.float32(Smin) + np.float32(0.1) * np.arange(n, dtype=np.float32)
 
 
 def _mass_change_curve(log10S, M):
@@ -153,8 +142,8 @@ def _mass_change_curve(log10S, M):
     ΔM_2 = np.abs(np.diff(M**2) / np.diff(log10S))
 
     # Compute log(𝒮) array used in derivatives (midpoints)
-    midx = (log10S[:-1] + log10S[1:]) / 2
-    S = 10**midx
+    midx = (log10S[:-1] + log10S[1:]) * np.float32(0.5)
+    S = np.power(np.float32(10.0), midx)
 
     return S, ΔM_2
 
@@ -175,17 +164,21 @@ def calc_mass_change(sig_vec, density_vec, Smin, Smax):
 
     Returns:
         (tuple): a tuple containing:
-            - **S** (:obj:`1D float np.ndarray`): the signature values
-            - **ΔΜ_2** (:obj:`1D float np.ndarray`): the mass change curve
+            - **S** (:obj:`1D float32 np.ndarray`): the signature values
+            - **ΔΜ_2** (:obj:`1D float32 np.ndarray`): the mass change curve
     """
+    sig_vec = np.asarray(sig_vec, dtype=np.float32)
+    density_vec = np.asarray(density_vec, dtype=np.float32)
+
     # Initialize our arrays
     log10S = _log10S_grid(Smin, Smax)
+    thresholds = np.power(np.float32(10.0), log10S)
     M = np.zeros_like(log10S)
 
     # Sum up all the mass in a structure type as a function of log(𝒮)
     for i in range(len(M)):
-        filter = sig_vec > _cast_threshold(10 ** log10S[i], sig_vec.dtype, ">")
-        M[i] = np.sum(density_vec[filter], dtype=np.float64)
+        filter = sig_vec > thresholds[i]
+        M[i] = np.sum(density_vec[filter])
 
     return _mass_change_curve(log10S, M)
 
@@ -211,6 +204,8 @@ def _structure_bools_cpu(
     the four boolean filters, the thresholds and curves behind them and,
     when ``verbose_flag`` is set, the volume and mass fractions.
     """
+    density_cube = np.asarray(density_cube, dtype=np.float32)
+    max_sigs = np.asarray(max_sigs, dtype=np.float32)
     N_cells = np.prod(density_cube.shape)
 
     # Check if the input density_cube is actually δ
@@ -222,7 +217,7 @@ def _structure_bools_cpu(
 
     if clusbool is None:
         clusbool, cluster_thresh, S_clus, f_vir_clus = make_the_clusbool(
-            density_cube - 1.0, max_sigs, overdensity_threshold
+            density_cube - np.float32(1.0), max_sigs, overdensity_threshold
         )
     else:
         cluster_thresh = None
@@ -248,18 +243,14 @@ def _structure_bools_cpu(
     )
     ind = np.argmax(dM2_fil)
     filament_thresh = S_fil[ind]
-    filbool = (
-        max_sigs[:, :, :, 1] > _cast_threshold(filament_thresh, max_sigs.dtype, ">")
-    ) & (~clusbool)
+    filbool = (max_sigs[:, :, :, 1] > filament_thresh) & (~clusbool)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     #                   Step 3. Create Wall bool Filter
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # Isolate Valid Walls (not clusters or filaments)
-    wall_valid_filt = (not_clus_flat) & (
-        filament_signature < _cast_threshold(filament_thresh, max_sigs.dtype, "<")
-    )
+    wall_valid_filt = (not_clus_flat) & (filament_signature < filament_thresh)
     wall_valid = wall_signature[wall_valid_filt]
     wall_density_cube_valid = np.reshape(density_cube, N_cells)[wall_valid_filt]
 
@@ -267,9 +258,7 @@ def _structure_bools_cpu(
     S_wall, dM2_wall = calc_mass_change(wall_valid, wall_density_cube_valid, Smin, Smax)
     ind = np.argmax(dM2_wall)
     wall_thresh = S_wall[ind]
-    wallbool = (
-        max_sigs[:, :, :, 2] > _cast_threshold(wall_thresh, max_sigs.dtype, ">")
-    ) & ~(filbool | clusbool)
+    wallbool = (max_sigs[:, :, :, 2] > wall_thresh) & ~(filbool | clusbool)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     #                   Step 4. Create Void bool Filter
@@ -295,11 +284,11 @@ def _structure_bools_cpu(
 
     if verbose_flag:
         masks = (clusbool, filbool, wallbool, voidbool)
-        total_mass = np.sum(density_cube, dtype=np.float64)
-        result["volume_fractions"] = [np.sum(b) / N_cells for b in masks]
-        result["mass_fractions"] = [
-            np.sum(density_cube[b], dtype=np.float64) / total_mass for b in masks
+        total_mass = np.sum(density_cube)
+        result["volume_fractions"] = [
+            np.float32(np.count_nonzero(b)) / np.float32(N_cells) for b in masks
         ]
+        result["mass_fractions"] = [np.sum(density_cube[b]) / total_mass for b in masks]
 
     return result
 
@@ -381,6 +370,7 @@ def calc_structure_bools(
     Args:
         density_cube (:obj:`3D float np.ndarray`):
             the (δ+1 = ρ/<ρ>) ``density_cube``, this is NOT (δ = ρ/<ρ> - 1).
+            It is converted to float32.
         max_sigs (:obj:`4D float np.ndarray`):
             the maximum signatures array from CosmoMMF.maximum_signature()
         verbose_flag (:obj:`bool`) :
@@ -394,13 +384,19 @@ def calc_structure_bools(
         overdensity_threshold (:obj:`int`, optional):
             the overdensity parameter threshold for determining virialization
         backend (:obj:`str`, optional):
-            ``"cpu"`` uses NumPy and scikit-image. ``"cupy"`` runs the tagging
-            on the GPU with CuPy; requires ``pip install 'pycosmommf[cupy]'``.
-            With ``"cupy"``, ``density_cube``, ``max_sigs`` and ``clusbool`` may
-            also be CuPy arrays or JAX GPU arrays (for example the output of
-            ``maximum_signature(..., backend="jax", return_numpy=False)``),
-            which are used in place without a copy. Both backends return NumPy
-            arrays and give the same filters. Defaults to ``"cpu"``.
+            ``"cpu"`` uses NumPy, Numba and scikit-image. ``"gpu"`` runs the
+            tagging on the GPU with CuPy; requires ``pip install
+            'pycosmommf[gpu]'``. With ``"gpu"``, ``density_cube``, ``max_sigs``
+            and ``clusbool`` may also be CuPy arrays or JAX GPU arrays (for
+            example the output of ``maximum_signature(..., backend="gpu",
+            return_numpy=False)``), which are used in place without a copy.
+            Both backends compute in float32 and return NumPy arrays; their
+            filters agree up to float32 summation-order differences. Defaults
+            to ``"cpu"``.
+
+    If no clump is virialized at any cluster-signature threshold, the grid is
+    too coarse to resolve clusters: a warning is printed and ``clusbool`` is
+    empty.
 
     Returns:
         (tuple): a tuple containing:
@@ -409,23 +405,23 @@ def calc_structure_bools(
             - **wallbool** (:obj:`3D bool np.ndarray`): the wall boolean filter
             - **voidbool** (:obj:`3D bool np.ndarray`): the void boolean filter
             - **summary_data** (:obj:`dict`): a dictionary returned only when ``verbose_flag = True``, it contains the following keys:
-                - **S_clus** (:obj:`1D float np.ndarray`): the signature values for clusters
-                - **f_vir_clus** (:obj:`1D float np.ndarray`): the virialization fraction for clusters
-                - **S_fil** (:obj:`1D float np.ndarray`): the signature values for filaments
-                - **dM2_fil** (:obj:`1D float np.ndarray`): the mass change curve for filaments
-                - **S_fil_thresh** (:obj:`float`): the threshold value for filaments
-                - **S_wall** (:obj:`1D float np.ndarray`): the signature values for walls
-                - **dM2_wall** (:obj:`1D float np.ndarray`): the mass change curve for walls
-                - **S_wall_thresh** (:obj:`float`): the threshold value for walls
-                - **mass_fractions** (:obj:`1D float np.ndarray`): a list of mass fractions for clusters, filaments, walls, and voids
-                - **volume_fractions** (:obj:`1D float np.ndarray`): a list of volume fractions for clusters, filaments, walls, and voids
+                - **S_clus** (:obj:`1D float32 np.ndarray`): the signature values for clusters
+                - **f_vir_clus** (:obj:`1D float32 np.ndarray`): the virialization fraction for clusters
+                - **S_fil** (:obj:`1D float32 np.ndarray`): the signature values for filaments
+                - **dM2_fil** (:obj:`1D float32 np.ndarray`): the mass change curve for filaments
+                - **S_fil_thresh** (:obj:`float32`): the threshold value for filaments
+                - **S_wall** (:obj:`1D float32 np.ndarray`): the signature values for walls
+                - **dM2_wall** (:obj:`1D float32 np.ndarray`): the mass change curve for walls
+                - **S_wall_thresh** (:obj:`float32`): the threshold value for walls
+                - **mass_fractions** (:obj:`1D float32 np.ndarray`): a list of mass fractions for clusters, filaments, walls, and voids
+                - **volume_fractions** (:obj:`1D float32 np.ndarray`): a list of volume fractions for clusters, filaments, walls, and voids
     """
 
-    if backend not in ["cpu", "cupy"]:
-        msg = "backend must be either 'cpu' or 'cupy'"
+    if backend not in ["cpu", "gpu"]:
+        msg = "backend must be either 'cpu' or 'gpu'"
         raise ValueError(msg)
 
-    if backend == "cupy":
+    if backend == "gpu":
         from ._cupy_tagging import structure_bools_cupy
 
         result = structure_bools_cupy(

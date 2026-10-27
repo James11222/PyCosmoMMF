@@ -80,8 +80,11 @@ def test_fast_hessian_from_smoothed():
     f_smooth = m.smooth_gauss(f, R_S, (kx, ky, kz))
     hessian = m.fast_hessian_from_smoothed(f_smooth, R_S, (kx, ky, kz))
     assert hessian.shape == (32, 32, 32, 6)
+    assert hessian.dtype == np.float32
+    # Far from the structures some components are below float32 resolution and
+    # can round to exactly 0, so require nearly (not strictly) all nonzero.
     for i in range(6):
-        assert np.all(hessian[:, :, :, i] != 0.0)
+        assert np.count_nonzero(hessian[:, :, :, i]) >= 0.999 * hessian[..., i].size
 
 
 def test_signatures_from_hessian():

@@ -139,17 +139,17 @@ def test_signatures_from_hessian_jax_matches_cpu():
 
 
 def test_maximum_signature_jax_nexusplus_shape():
-    sigs = m.maximum_signature(_Rs, _field, algorithm="NEXUSPLUS", backend="jax")
+    sigs = m.maximum_signature(_Rs, _field, algorithm="NEXUSPLUS", backend="gpu")
     assert sigs.shape == (32, 32, 32, 3)
 
 
 def test_maximum_signature_jax_nexus_shape():
-    sigs = m.maximum_signature(_Rs, _field, algorithm="NEXUS", backend="jax")
+    sigs = m.maximum_signature(_Rs, _field, algorithm="NEXUS", backend="gpu")
     assert sigs.shape == (32, 32, 32, 3)
 
 
 def test_maximum_signature_jax_nexusplus_matches_cpu():
-    jax_sigs = m.maximum_signature(_Rs, _field, algorithm="NEXUSPLUS", backend="jax")
+    jax_sigs = m.maximum_signature(_Rs, _field, algorithm="NEXUSPLUS", backend="gpu")
     # Float32 FFT differences compound across the multi-scale loop; near-zero
     # "background" voxels can differ enormously in relative terms but are
     # irrelevant for structure tagging.  We use atol=5e-3 to cover the worst
@@ -158,21 +158,21 @@ def test_maximum_signature_jax_nexusplus_matches_cpu():
 
 
 def test_maximum_signature_jax_nexus_matches_cpu():
-    jax_sigs = m.maximum_signature(_Rs, _field, algorithm="NEXUS", backend="jax")
+    jax_sigs = m.maximum_signature(_Rs, _field, algorithm="NEXUS", backend="gpu")
     np.testing.assert_allclose(jax_sigs, _cpu_nexus, rtol=1e-2, atol=5e-3)
 
 
 def test_maximum_signature_returns_numpy():
     """Output must be a plain numpy array regardless of backend."""
-    sigs = m.maximum_signature(_Rs, _field, backend="jax")
+    sigs = m.maximum_signature(_Rs, _field, backend="gpu")
     assert isinstance(sigs, np.ndarray)
 
 
 def test_maximum_signature_return_numpy_false_keeps_jax_array():
-    sigs = m.maximum_signature(_Rs, _field, backend="jax", return_numpy=False)
+    sigs = m.maximum_signature(_Rs, _field, backend="gpu", return_numpy=False)
     assert isinstance(sigs, jax.Array)
     np.testing.assert_array_equal(
-        np.asarray(sigs), m.maximum_signature(_Rs, _field, backend="jax")
+        np.asarray(sigs), m.maximum_signature(_Rs, _field, backend="gpu")
     )
 
 
@@ -195,7 +195,7 @@ def test_jax_backend_nexusplus_rejects_negative_input():
     """JAX path must raise the same clear error as the CPU path on δ."""
     delta = _field / np.mean(_field) - 1.0
     with pytest.raises(ValueError, match="NEXUSPLUS"):
-        m.maximum_signature(_Rs, delta, algorithm="NEXUSPLUS", backend="jax")
+        m.maximum_signature(_Rs, delta, algorithm="NEXUSPLUS", backend="gpu")
 
 
 def test_jax_backend_direct_call_rejects_negative_input():
@@ -210,5 +210,5 @@ def test_jax_backend_direct_call_rejects_negative_input():
 def test_jax_backend_nexus_allows_negative_input():
     """NEXUS path does not log-transform, so negative input must work."""
     delta = _field / np.mean(_field) - 1.0
-    sigs = m.maximum_signature(_Rs, delta, algorithm="NEXUS", backend="jax")
+    sigs = m.maximum_signature(_Rs, delta, algorithm="NEXUS", backend="gpu")
     assert sigs.shape == delta.shape + (3,)

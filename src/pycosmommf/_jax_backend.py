@@ -1,11 +1,13 @@
 """
 JAX backend for pycosmommf. Requires jax to be installed:
 
-    pip install 'pycosmommf[jax]'
+    pip install 'pycosmommf[gpu]'
 
-All public functions mirror the CPU API but operate on JAX arrays.
-The output of maximum_signature_jax() is always a numpy ndarray so the
-rest of the package (tagging, etc.) remains unchanged.
+Reached through ``maximum_signature(..., backend="gpu")``. All public
+functions mirror the CPU API but operate on JAX arrays, in float32 (JAX's
+default precision) like the CPU backend. maximum_signature_jax() returns a
+numpy ndarray unless ``return_numpy=False``, in which case the JAX array
+stays on the GPU for ``calc_structure_bools(..., backend="gpu")``.
 
 Memory model
 ------------
@@ -48,7 +50,7 @@ def _jnp():
     except ImportError as e:
         msg = (
             "The JAX backend requires JAX to be installed. "
-            "Install it with:  pip install 'pycosmommf[jax]'"
+            "Install it with:  pip install 'pycosmommf[gpu]'"
         )
         raise ImportError(msg) from e
 
@@ -62,7 +64,7 @@ def _jax():
     except ImportError as e:
         msg = (
             "The JAX backend requires JAX to be installed. "
-            "Install it with:  pip install 'pycosmommf[jax]'"
+            "Install it with:  pip install 'pycosmommf[gpu]'"
         )
         raise ImportError(msg) from e
 
@@ -116,7 +118,7 @@ def smooth_gauss_jax(f, R_S, kv):
     """
     jnp = _jnp()
     kx, ky, kz = (jnp.asarray(k) for k in kv)
-    f = jnp.asarray(f)
+    f = jnp.asarray(f, dtype=jnp.float32)
 
     KX = kx[:, None, None]
     KY = ky[None, :, None]
@@ -145,7 +147,7 @@ def smooth_loggauss_jax(f, R_S, kv):
     """
     jnp = _jnp()
     kx, ky, kz = (jnp.asarray(k) for k in kv)
-    f = jnp.asarray(f)
+    f = jnp.asarray(f, dtype=jnp.float32)
 
     KX = kx[:, None, None]
     KY = ky[None, :, None]

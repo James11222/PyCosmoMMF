@@ -92,3 +92,9 @@ def test_maximum_signature_nexus_allows_negative_input():
     delta = test_field / np.mean(test_field) - 1.0
     sigs = m.maximum_signature(Rs, delta, algorithm="NEXUS", backend="cpu")
     assert sigs.shape == delta.shape + (3,)
+
+
+@pytest.mark.parametrize("backend", ["jax", "cupy"])
+def test_maximum_signature_rejects_old_backend_names(backend):
+    with pytest.raises(ValueError, match="backend must be"):
+        m.maximum_signature([1.0], test_field, backend=backend)

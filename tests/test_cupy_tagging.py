@@ -1,12 +1,13 @@
 """
-Tests for the CuPy structure-tagging backend.
+Tests for the GPU (CuPy) structure-tagging backend.
 
 All tests in this module are skipped automatically when CuPy is not installed
 or no CUDA GPU is available. They verify that:
   1. ``cupyx.scipy.ndimage.label`` with the 3×3×3 structure reproduces the
      26-connected clumps of ``skimage.measure.label``.
-  2. ``calc_structure_bools(..., backend="cupy")`` gives exactly the same
-     boolean filters and thresholds as the CPU backend.
+  2. ``calc_structure_bools(..., backend="gpu")`` gives the same thresholds
+     and boolean filters as the CPU backend, up to float32 summation-order
+     differences.
   3. NumPy, CuPy and JAX inputs give the same result.
 """
 
@@ -54,16 +55,25 @@ def _assert_same_partition(labels_a, labels_b):
 
 
 def _assert_same_tagging(cpu_out, gpu_out):
+    """
+    Thresholds must match exactly. Both backends sum in float32 but in a
+    different order, so curves and fractions agree to float32 precision and a
+    voxel sitting exactly on a threshold may in principle flip.
+    """
     for cpu_bool, gpu_bool in zip(cpu_out[:4], gpu_out[:4]):
         assert gpu_bool.dtype == np.bool_
-        np.testing.assert_array_equal(cpu_bool, gpu_bool)
+        assert np.count_nonzero(cpu_bool != gpu_bool) <= 1e-4 * cpu_bool.size
     if len(cpu_out) == 5:
         cpu_sum, gpu_sum = cpu_out[4], gpu_out[4]
         for key in ("S_clus", "f_vir_clus", "S_fil", "S_fil_thresh", "S_wall"):
             np.testing.assert_array_equal(cpu_sum[key], gpu_sum[key])
         assert cpu_sum["S_wall_thresh"] == gpu_sum["S_wall_thresh"]
-        for key in ("dM2_fil", "dM2_wall", "mass_fractions", "volume_fractions"):
-            np.testing.assert_allclose(cpu_sum[key], gpu_sum[key], rtol=1e-10)
+        for key in ("dM2_fil", "dM2_wall"):
+            np.testing.assert_allclose(
+                cpu_sum[key], gpu_sum[key], rtol=1e-4, atol=1e-5 * cpu_sum[key].max()
+            )
+        for key in ("mass_fractions", "volume_fractions"):
+            np.testing.assert_allclose(cpu_sum[key], gpu_sum[key], rtol=1e-5)
 
 
 # ---------------------------------------------------------------------------
@@ -101,7 +111,7 @@ def test_make_the_clusbool_matches_cpu(overdensity_threshold, sig_scale):
         assert np.isnan(cpu[3]).any()
 
     np.testing.assert_array_equal(cpu[0], cp.asnumpy(gpu[0]))
-    assert cpu[1] == gpu[1]
+    assert cpu[1] == gpu[1]  # both None when no clump is virialized
     np.testing.assert_array_equal(cpu[2], gpu[2])
     np.testing.assert_array_equal(cpu[3], gpu[3])  # NaN where no clumps
 
@@ -117,14 +127,14 @@ def test_calc_structure_bools_matches_cpu(verbose_flag, given_clusbool):
     clusbool = _sigs[..., 0] > 1.0 if given_clusbool else None
     kwargs = {"verbose_flag": verbose_flag, "clusbool": clusbool}
     cpu_out = m.calc_structure_bools(_density, _sigs, backend="cpu", **kwargs)
-    gpu_out = m.calc_structure_bools(_density, _sigs, backend="cupy", **kwargs)
+    gpu_out = m.calc_structure_bools(_density, _sigs, backend="gpu", **kwargs)
     _assert_same_tagging(cpu_out, gpu_out)
 
 
 def test_calc_structure_bools_accepts_cupy_input():
     cpu_out = m.calc_structure_bools(_density, _sigs, True)
     gpu_out = m.calc_structure_bools(
-        cp.asarray(_density), cp.asarray(_sigs), True, backend="cupy"
+        cp.asarray(_density), cp.asarray(_sigs), True, backend="gpu"
     )
     _assert_same_tagging(cpu_out, gpu_out)
 
@@ -132,15 +142,24 @@ def test_calc_structure_bools_accepts_cupy_input():
 def test_calc_structure_bools_accepts_jax_input():
     pytest.importorskip("jax")
     sigs_jax = m.maximum_signature(
-        _Rs, _density, algorithm="NEXUSPLUS", backend="jax", return_numpy=False
+        _Rs, _density, algorithm="NEXUSPLUS", backend="gpu", return_numpy=False
     )
     from_numpy = m.calc_structure_bools(
-        _density, np.asarray(sigs_jax), True, backend="cupy"
+        _density, np.asarray(sigs_jax), True, backend="gpu"
     )
-    from_jax = m.calc_structure_bools(_density, sigs_jax, True, backend="cupy")
+    from_jax = m.calc_structure_bools(_density, sigs_jax, True, backend="gpu")
     _assert_same_tagging(from_numpy, from_jax)
 
 
 def test_calc_structure_bools_cupy_rejects_overdensity():
     with pytest.raises(ValueError, match="overdensity"):
-        m.calc_structure_bools(_density - 1.0, _sigs, False, backend="cupy")
+        m.calc_structure_bools(_density - 1.0, _sigs, False, backend="gpu")
+
+
+def test_calc_structure_bools_gpu_unresolved_clusters_is_empty(capsys):
+    # A huge overdensity threshold: no clump is virialized at any threshold.
+    out = m.calc_structure_bools(
+        _density, _sigs, False, overdensity_threshold=1e9, backend="gpu"
+    )
+    assert not out[0].any()
+    assert "not sufficiently high to resolve virialized" in capsys.readouterr().out

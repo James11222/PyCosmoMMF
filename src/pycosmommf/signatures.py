@@ -108,15 +108,17 @@ def signatures_from_hessian(hessian):  # pragma: no cover
 
     hsize = hessian.shape[:3]
     sigs = np.zeros((hsize[0], hsize[1], hsize[2], 3), dtype=np.float32)
+    one = np.float32(1.0)
+    zero = np.float32(0.0)
 
-    # helper functions
+    # helper functions (float32 constants keep Numba from promoting to float64)
     def θ(x):
         """
         Heaviside step function. Returns one if the argument is positive, zero otherwise.
         """
         if x > 0:
-            return 1
-        return 0
+            return one
+        return zero
 
     def xθ(x):
         """
@@ -124,7 +126,7 @@ def signatures_from_hessian(hessian):  # pragma: no cover
         """
         if x > 0:
             return x
-        return 0
+        return zero
 
     for i in nb.prange(hsize[0]):
         for j in range(hsize[1]):
@@ -147,12 +149,12 @@ def signatures_from_hessian(hessian):  # pragma: no cover
                         θ(-e1) * θ(-e2) * θ(-e3)
                     )
 
-                    sigs[i, j, k, 1] = (np.abs(e2 / e1) * xθ(1 - np.abs(e3 / e1))) * (
+                    sigs[i, j, k, 1] = (np.abs(e2 / e1) * xθ(one - np.abs(e3 / e1))) * (
                         np.abs(e2) * θ(-e1) * θ(-e2)
                     )
 
                     sigs[i, j, k, 2] = (
-                        xθ(1 - np.abs(e2 / e1)) * xθ(1 - np.abs(e3 / e1))
+                        xθ(one - np.abs(e2 / e1)) * xθ(one - np.abs(e3 / e1))
                     ) * (np.abs(e1) * θ(-e1))
 
     return sigs
@@ -195,22 +197,23 @@ def maximum_signature(
         density_cube (:obj:`3D float np.ndarray`):
             The 3D density field to analyze. For ``algorithm="NEXUSPLUS"``
             this must be strictly positive (i.e. ``δ+1 = ρ/⟨ρ⟩``); a
-            ``ValueError`` is raised otherwise.
+            ``ValueError`` is raised otherwise. It is converted to float32,
+            and every computation runs in float32 on both backends.
         algorithm (:obj:`str`, optional):
             The algorithm to use for smoothing. Can be either "NEXUS" or "NEXUSPLUS". Defaults to "NEXUSPLUS".
         eps (:obj:`float`, optional):
             Small value to avoid division by zero. Defaults to ``1e-16``.
         backend (:obj:`str`, optional):
-            Computational backend. ``"cpu"`` uses the default NumPy/Numba path.
-            ``"jax"`` uses JAX and can run on GPU/TPU when available; requires
-            ``pip install 'pycosmommf[jax]'``. Defaults to ``"cpu"``.
+            ``"cpu"`` uses NumPy, SciPy and Numba. ``"gpu"`` uses JAX on the
+            GPU; requires ``pip install 'pycosmommf[gpu]'``. Defaults to
+            ``"cpu"``.
         return_numpy (:obj:`bool`, optional):
-            Only used with ``backend="jax"``. ``False`` returns the result as a
-            JAX array that stays on the device, which ``calc_structure_bools(...,
-            backend="cupy")`` can use without a copy. Defaults to ``True``.
+            Only used with ``backend="gpu"``. ``False`` returns the result as a
+            JAX array that stays on the GPU, which ``calc_structure_bools(...,
+            backend="gpu")`` can use without a copy. Defaults to ``True``.
 
     Returns:
-        (:obj:`4D float np.ndarray`):
+        (:obj:`4D float32 np.ndarray`):
             An array of signatures with shape ``(nx, ny, nz, 3)``, where ``nx, ny, nz`` are the dimensions of the input ``density_cube``.
             The last dimension contains the signatures for clusters, filaments, and walls respectively.
     """
@@ -219,13 +222,14 @@ def maximum_signature(
         msg = "algorithm must be either 'NEXUS' or 'NEXUSPLUS'"
         raise ValueError(msg)
 
-    if backend not in ["cpu", "jax"]:
-        msg = "backend must be either 'cpu' or 'jax'"
+    if backend not in ["cpu", "gpu"]:
+        msg = "backend must be either 'cpu' or 'gpu'"
         raise ValueError(msg)
 
+    density_cube = np.asarray(density_cube, dtype=np.float32)
     _validate_density_for_algorithm(density_cube, algorithm)
 
-    if backend == "jax":
+    if backend == "gpu":
         from ._jax_backend import maximum_signature_jax
 
         return maximum_signature_jax(
@@ -235,13 +239,14 @@ def maximum_signature(
     nx, ny, nz = density_cube.shape
 
     # Make sure the field has no 0 values
+    eps = np.float32(eps)
     density_cube = density_cube + eps
 
     # Calculate wave vectors for our field
     wave_vecs = wavevectors3D((nx, ny, nz))
 
     # Calculate signatures at each scale Rn, determine max
-    sigmax = np.ones((nx, ny, nz, 3), dtype=np.float32) * eps
+    sigmax = np.full((nx, ny, nz, 3), eps, dtype=np.float32)
 
     @jit_compiler
     def perform_loop(sigmax, sigs_Rn, nx, ny, nz):  # pragma: no cover

@@ -6,9 +6,9 @@ import skimage.measure
 
 import pycosmommf as m
 from pycosmommf.tagging import (
-    _cast_threshold,
     _clump_mean_overdensity,
     _cluster_signature_thresholds,
+    _log10S_grid,
 )
 
 N = 48
@@ -41,26 +41,31 @@ def _clump_fields(signature_value=50.0):
     return delta, max_sigs, (big | corner, small)
 
 
-def test_cast_threshold_matches_float64_comparison():
-    rng = np.random.default_rng(0)
-    thresholds = [0.1, 1.0, 3.5, -0.7, 10**-2.95, 10**1.85, float(np.float32(0.1))]
-    for t in thresholds:
-        t32 = np.float32(t)
-        near = [t32]
-        for _ in range(3):
-            near.append(np.nextafter(near[-1], np.float32(np.inf)))
-        near.append(np.nextafter(t32, np.float32(-np.inf)))
-        x = np.concatenate(
-            [rng.uniform(-50, 50, 1000).astype(np.float32), np.array(near)]
-        )
-        exact_gt = x.astype(np.float64) > t
-        exact_lt = x.astype(np.float64) < t
-        assert np.array_equal(x > _cast_threshold(t, x.dtype, ">"), exact_gt)
-        assert np.array_equal(x < _cast_threshold(t, x.dtype, "<"), exact_lt)
-        assert _cast_threshold(t, x.dtype, ">").dtype == np.float32
+@pytest.mark.parametrize(("Smin", "Smax"), [(-3, 2), (-2.5, 1.5), (-1, 3)])
+def test_log10S_grid_matches_arange(Smin, Smax):
+    grid = _log10S_grid(Smin, Smax)
+    reference = np.arange(Smin, Smax + 0.1, 0.1)
+    assert grid.dtype == np.float32
+    assert grid.shape == reference.shape
+    np.testing.assert_allclose(grid, reference, atol=1e-6)
 
-    assert _cast_threshold(0.1, np.float64, ">") == 0.1
-    assert _cast_threshold(0.1, np.float64, ">").dtype == np.float64
+
+def test_float32_throughout():
+    """float64 input is converted; every output array and number is float32."""
+    rng = np.random.default_rng(3)
+    density = np.exp(rng.standard_normal((24, 24, 24)))
+    density /= density.mean()
+    assert density.dtype == np.float64
+
+    sigs = m.maximum_signature([1.0, 2.0], density, algorithm="NEXUSPLUS")
+    assert sigs.dtype == np.float32
+
+    out = m.calc_structure_bools(density, sigs.astype(np.float64), True)
+    for value in out[4].values():
+        if isinstance(value, list):
+            assert all(isinstance(v, np.float32) for v in value)
+        elif value is not None:
+            assert np.asarray(value).dtype == np.float32
 
 
 def test_clump_mean_overdensity_large_clump_is_exact():
@@ -74,7 +79,8 @@ def test_clump_mean_overdensity_large_clump_is_exact():
     for label in range(1, n_clumps + 1):
         mask = clumps == label
         expected = delta[mask].astype(np.float64).mean()
-        np.testing.assert_allclose(means[label - 1], expected, rtol=1e-12)
+        assert means.dtype == np.float32
+        np.testing.assert_allclose(means[label - 1], expected, rtol=1e-4)
     assert {int(np.sum(clumps == lab)) for lab in (1, 2)} == {
         int(merged.sum()),
         int(small.sum()),
@@ -106,13 +112,27 @@ def test_make_the_clusbool_thresholds_without_clumps():
     assert S_th < 5.0
     assert clusbool.any()
 
+
+def test_make_the_clusbool_no_clumps_is_empty(capsys):
     # No clumps at any threshold: every fraction is NaN and clusbool is empty.
+    delta, max_sigs, _ = _clump_fields()
     clusbool, S_th, _, fractions = m.make_the_clusbool(
         delta, np.zeros_like(max_sigs), 370
     )
     assert np.all(np.isnan(fractions))
-    assert S_th == thresholds[0]
+    assert S_th is None
     assert not clusbool.any()
+    assert "not sufficiently high to resolve virialized" in capsys.readouterr().out
+
+
+def test_make_the_clusbool_nothing_virialized_is_empty(capsys):
+    # Clumps exist at every threshold, but none has a mean δ above 1e6.
+    delta, max_sigs, _ = _clump_fields()
+    clusbool, S_th, _, fractions = m.make_the_clusbool(delta, max_sigs, 1e6)
+    np.testing.assert_array_equal(fractions, np.zeros(10))
+    assert S_th is None
+    assert not clusbool.any()
+    assert "not sufficiently high to resolve virialized" in capsys.readouterr().out
 
 
 @pytest.mark.parametrize("verbose_flag", [True, False])
@@ -137,11 +157,12 @@ def test_calc_structure_bools_finds_clusters(verbose_flag):
     if verbose_flag:
         summary = out[4]
         np.testing.assert_allclose(sum(summary["volume_fractions"]), 1.0)
-        np.testing.assert_allclose(sum(summary["mass_fractions"]), 1.0, rtol=1e-6)
+        np.testing.assert_allclose(sum(summary["mass_fractions"]), 1.0, rtol=1e-5)
 
 
-def test_calc_structure_bools_rejects_unknown_backend():
+@pytest.mark.parametrize("backend", ["cupy", "jax"])
+def test_calc_structure_bools_rejects_unknown_backend(backend):
     density = np.ones((8, 8, 8), dtype=np.float32)
     sigs = np.zeros((8, 8, 8, 3), dtype=np.float32)
     with pytest.raises(ValueError, match="backend"):
-        m.calc_structure_bools(density, sigs, False, backend="gpu")
+        m.calc_structure_bools(density, sigs, False, backend=backend)
