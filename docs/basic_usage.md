@@ -81,7 +81,7 @@ API Docs tab for a detailed summary of what is inside `summary_data`.
 verbose_flag = True  # or False
 
 
-clusbool, filbool, wallbool, voidbool, summary_data = PyCosmoMMF.calc_structure_bools(
+structure_filter, summary_data = PyCosmoMMF.calc_structure_bools(
     density_field, max_signatures, verbose_flag
 )  # tag structures
 ```
@@ -92,9 +92,21 @@ clusbool, filbool, wallbool, voidbool, summary_data = PyCosmoMMF.calc_structure_
 verbose_flag = False
 
 
-clusbool, filbool, wallbool, voidbool = PyCosmoMMF.calc_structure_bools(
+structure_filter = PyCosmoMMF.calc_structure_bools(
     density_field, max_signatures, verbose_flag
 )  # tag structures
+```
+
+`structure_filter` is a `uint8` array with the same shape as the density field
+that gives the structure type of every voxel: `1` = cluster, `2` = filament,
+`3` = wall and `4` = void. Every voxel has exactly one type. Boolean filters for
+a single structure type are one comparison away:
+
+```python
+clusbool = structure_filter == 1
+filbool = structure_filter == 2
+wallbool = structure_filter == 3
+voidbool = structure_filter == 4
 ```
 
 We also note in the `calc_structure_bools()` function, one can use their own
@@ -114,7 +126,7 @@ clusbool_ext = np.load(
 verbose_flag = False
 
 
-clusbool, filbool, wallbool, voidbool = PyCosmoMMF.calc_structure_bools(
+structure_filter = PyCosmoMMF.calc_structure_bools(
     density_field, max_signatures, verbose_flag, clusbool_ext
 )  # tag structures
 ```
@@ -128,8 +140,8 @@ but other values can be 200 or 500 corresponding to `R_200` or `R_500`.
 average overdensity greater than this value, they are thought to be
 virialized/collapsed.
 
-The boolean filters for each structure type produced by `calc_structure_bools()`
-can be used to tag structures within a density field, the results of this can be
+The structure filter produced by `calc_structure_bools()` can be used to tag
+structures within a density field, the results of this can be
 seen below
 
 ```{image} images/final_tagging_figure.png

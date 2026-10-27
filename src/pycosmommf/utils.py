@@ -39,9 +39,9 @@ def wall(n):
             The size of the 3D array to create.
 
     Returns:
-        (:obj:`3D float np.ndarray`): An nxnxn array with a wall in the center.
+        (:obj:`3D float32 np.ndarray`): An nxnxn array with a wall in the center.
     """
-    array = np.zeros((n, n, n))
+    array = np.zeros((n, n, n), dtype=np.float32)
     array[:, :, :] = 0.1
     index = n // 2
     array[index, :, :] = 10.0
@@ -61,9 +61,9 @@ def cylinder(n, r):
             The radius of the cylinder.
 
     Returns:
-        (:obj:`3D float np.ndarray`): An nxnxn array with a cylinder in the center.
+        (:obj:`3D float32 np.ndarray`): An nxnxn array with a cylinder in the center.
     """
-    array = np.zeros((n, n, n), dtype=np.float64)
+    array = np.zeros((n, n, n), dtype=np.float32)
     array[:, :, :] = 0.1
     for x in range(n):
         for y in range(n):
@@ -86,9 +86,9 @@ def sphere(n, r):
             The radius of the sphere.
 
     Returns:
-        (:obj:`3D float np.ndarray`): An nxnxn array with a sphere in the center.
+        (:obj:`3D float32 np.ndarray`): An nxnxn array with a sphere in the center.
     """
-    array = np.zeros((n, n, n), dtype=np.float64)
+    array = np.zeros((n, n, n), dtype=np.float32)
     array[:, :, :] = 0.1
     for x in range(n):
         for y in range(n):
