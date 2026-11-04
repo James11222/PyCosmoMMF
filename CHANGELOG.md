@@ -14,7 +14,9 @@ release on PyPI. This release changes the return value of
 
 - **GPU backend.** `maximum_signature()` and `calc_structure_bools()` take a new
   `backend` argument. `backend="gpu"` runs the signatures with JAX and the
-  structure tagging with CuPy. Install it with `pip install 'pycosmommf[gpu]'`. The GPU backend is capable of computing the cosmic web structure tags on a 1024^3 grid in just a couple minutes.
+  structure tagging with CuPy. Install it with `pip install 'pycosmommf[gpu]'`.
+  The GPU backend is capable of computing the cosmic web structure tags on a
+  1024^3 grid in just a couple minutes.
 - **Faster CPU signatures.** The Hessian eigenvalues are now computed with an
   analytic closed-form solver instead of a per-voxel `np.linalg.eigvals` call,
   and the FFTs run in complex64. `maximum_signature()` on the CPU is about 4×
@@ -28,10 +30,10 @@ release on PyPI. This release changes the return value of
 ### Breaking changes
 
 - `calc_structure_bools()` returns one `uint8` array, `structure_filter`, with
-  the same shape as the density field. Each voxel holds its structure type:
-  `1` = cluster, `2` = filament, `3` = wall, `4` = void. Every voxel has exactly
-  one type, so the array has no zeros. With `verbose_flag=True` the function
-  returns `(structure_filter, summary_data)`.
+  the same shape as the density field. Each voxel holds its structure type: `1`
+  = cluster, `2` = filament, `3` = wall, `4` = void. Every voxel has exactly one
+  type, so the array has no zeros. With `verbose_flag=True` the function returns
+  `(structure_filter, summary_data)`.
 
   To migrate code written for 1.0.3:
 
@@ -98,15 +100,15 @@ How the GPU signatures (`_jax_backend.py`) work:
   running maximum) is one `jax.jit` graph. The running maximum buffer is donated
   (`donate_argnums`), so XLA updates it in place.
 - The eigenvalues use the same analytic solver as the CPU backend (see
-  Performance below). There is no `(N, N, N, 3, 3)` tensor and no
-  call to `jnp.linalg.eigh`.
+  Performance below). There is no `(N, N, N, 3, 3)` tensor and no call to
+  `jnp.linalg.eigh`.
 - The six Hessian components stay as six separate arrays, and the signature
   stage is tiled along the first axis for grids larger than 128³.
 - Peak GPU memory is about 9–10× the size of one float32 field. A 512³ NEXUS+
   run needs 11.8 GiB and takes 5.4 s on a V100S; a naive JAX port ran out of
-  memory on a 32 GB GPU. A 1024³ run, the largest supported grid, needs about
-  65 GiB, so it needs an 80 GB GPU. A 40 GB GPU is not enough at 1024³. The
-  backend runs on a single GPU.
+  memory on a 32 GB GPU. A 1024³ run, the largest supported grid, needs about 65
+  GiB, so it needs an 80 GB GPU. A 40 GB GPU is not enough at 1024³. The backend
+  runs on a single GPU.
 - On Apple `jax-metal`, which has no FFT or complex support, the backend warns
   and runs JAX on the CPU.
 
@@ -127,22 +129,21 @@ How the GPU tagging (`_cupy_tagging.py`) works:
   same thresholds and the same structure filters. In general the two backends
   agree up to float32 summation order, not bit for bit.
 
-Recommended settings for large grids: set
-`XLA_PYTHON_CLIENT_PREALLOCATE=false` and
-`XLA_PYTHON_CLIENT_ALLOCATOR=cuda_async` before you import JAX. The default
+Recommended settings for large grids: set `XLA_PYTHON_CLIENT_PREALLOCATE=false`
+and `XLA_PYTHON_CLIENT_ALLOCATOR=cuda_async` before you import JAX. The default
 JAX allocator fragments memory and runs out of memory at 1024³.
 
-GPU and CPU signatures differ by about 10⁻⁶ (relative) after smoothing and by
-up to a few 10⁻³ (absolute) in the final signatures, because XLA and SciPy use
+GPU and CPU signatures differ by about 10⁻⁶ (relative) after smoothing and by up
+to a few 10⁻³ (absolute) in the final signatures, because XLA and SciPy use
 different float32 FFTs. These differences do not change the structure tagging.
 
 #### Other additions
 
 - If no clump is virialized at any cluster-signature threshold, the cluster
   filter is empty and a warning says that the grid resolution is too low to
-  resolve virialized clusters. `make_the_clusbool()` then returns `None` as
-  the threshold. In 1.0.3 the function picked a threshold anyway: the lowest
-  one, or one with no clumps (see Fixed below).
+  resolve virialized clusters. `make_the_clusbool()` then returns `None` as the
+  threshold. In 1.0.3 the function picked a threshold anyway: the lowest one, or
+  one with no clumps (see Fixed below).
 
 ### Performance
 
@@ -150,13 +151,13 @@ different float32 FFTs. These differences do not change the structure tagging.
   a 3×3 array for every voxel and call `np.linalg.eigvals` and `np.sort` on it.
   It now calls `_eigvalsh_3x3_sym`, a scalar Numba function that uses the
   closed-form trigonometric solution for real symmetric 3×3 matrices (Smith
-  1961, *Communications of the ACM* 4, 168). The function allocates nothing per
+  1961, _Communications of the ACM_ 4, 168). The function allocates nothing per
   voxel and returns the eigenvalues already sorted. It rescales each matrix by
   its largest absolute entry before it applies the formula, so it stays accurate
   for near-zero Hessians in voids. The CPU and GPU backends use the same solver.
 - **complex64 FFTs on the CPU.** Smoothing and the Hessian use `scipy.fft`
-  instead of `np.fft`. `scipy.fft` keeps float32 input in complex64. With
-  numpy < 2, `np.fft` always computes in complex128.
+  instead of `np.fft`. `scipy.fft` keeps float32 input in complex64. With numpy
+  < 2, `np.fft` always computes in complex128.
 - **Fewer float64 promotions.** Numba kernels use float32 constants, so they no
   longer promote float32 arithmetic to float64.
 
@@ -172,11 +173,11 @@ second call, so the Numba compilation of module-level functions is excluded:
 | `maximum_signature()`, 1 scale          | 6.47 s | 1.60 s | 4.0×    |
 | `maximum_signature()`, 10 scales        | 58.9 s | 13.8 s | 4.3×    |
 
-At 256³ the current code takes 53 s for 10 scales. The 1.0.3 run at 256³ did
-not finish (the process was killed). On an A100 GPU, the same 256³ field takes
-1.7 s for 10 scales with `backend="gpu"` (9.7 s on the first call, which
-includes JIT compilation), and the GPU tagging takes 0.08 s against 5.9 s on
-the CPU, with an identical structure filter.
+At 256³ the current code takes 53 s for 10 scales. The 1.0.3 run at 256³ did not
+finish (the process was killed). On an A100 GPU, the same 256³ field takes 1.7 s
+for 10 scales with `backend="gpu"` (9.7 s on the first call, which includes JIT
+compilation), and the GPU tagging takes 0.08 s against 5.9 s on the CPU, with an
+identical structure filter.
 
 ### Fixed
 
@@ -198,8 +199,8 @@ the CPU, with an identical structure filter.
 
 - `scipy` is now a declared dependency. The CPU FFTs use `scipy.fft`.
 - New optional extra `gpu` (`jax[cuda12]>=0.4.30`, `cupy-cuda12x`).
-- The `requires-python` upper bound (`<3.13`) is removed. The requirement is
-  now `>=3.8`.
+- The `requires-python` upper bound (`<3.13`) is removed. The requirement is now
+  `>=3.8`.
 
 ### Internal changes
 
@@ -221,4 +222,3 @@ the CPU, with an identical structure filter.
 ## 1.0.3 and earlier
 
 See the [GitHub releases](https://github.com/James11222/pycosmommf/releases).
-
