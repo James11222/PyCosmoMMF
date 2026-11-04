@@ -4,6 +4,7 @@
 
 basic_usage
 api_tab
+changelog
 
 ```
 
@@ -24,7 +25,8 @@ api_tab
 # PyCosmoMMF
 
 PyCosmoMMF is a package for identifying structures in the Cosmic Web from a
-given overdensity field.
+given overdensity field. Version 2.0 includes a gpu backend for running the code
+with NVIDIA GPUs.
 
 ### Authors
 

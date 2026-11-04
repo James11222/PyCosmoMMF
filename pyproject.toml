@@ -11,9 +11,9 @@ authors = [
 description = "A package for identifying structures in the cosmic web."
 readme = "README.md"
 license.file = "LICENSE"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
-  "Development Status :: 1 - Planning",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Science/Research",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
@@ -21,7 +21,6 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
@@ -90,9 +89,16 @@ testpaths = [
 
 [tool.coverage]
 run.source = ["pycosmommf"]
+# GitHub Actions has no free GPUs, so the GPU backend is left out of coverage:
+# its two modules and the branches that dispatch to them.
+run.omit = [
+  "*/pycosmommf/_jax_backend.py",
+  "*/pycosmommf/_cupy_tagging.py",
+]
 report.exclude_also = [
   '\.\.\.',
   'if typing.TYPE_CHECKING:',
+  'if backend == "gpu":',
 ]
 
 [tool.ruff]
@@ -119,7 +125,6 @@ extend-select = [
   "YTT",      # flake8-2020
   "EXE",      # flake8-executable
   "NPY",      # NumPy specific rules
-  "PD",       # pandas-vet
 ]
 ignore = [
   "F403",     # star imports

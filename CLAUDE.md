@@ -123,4 +123,6 @@ CPU and GPU tagging agree up to float32 summation order (pairwise NumPy sums vs 
 - `tests/test_jax_backend.py` — JAX shape tests and JAX-vs-CPU agreement tests for each stage. The whole module uses `pytest.importorskip("jax")`, so it is **silently skipped** when JAX is not installed. CI installs only `.[test]` (no JAX), so these tests run only locally; install `.[gpu]` before touching `_jax_backend.py` or `_cupy_tagging.py`.
 - `tests/test_package.py` — basic package-level smoke tests.
 
-Pytest is configured with `--strict-markers`, `--strict-config`, and `filterwarnings = error`, so any new warnings will cause test failures. CI runs Python 3.8 and 3.12.
+Pytest is configured with `--strict-markers`, `--strict-config`, and `filterwarnings = error`, so any new warnings will cause test failures. CI runs Python 3.9 and 3.12.
+
+Coverage leaves out the GPU backend, because GitHub Actions has no free GPUs: `[tool.coverage]` in `pyproject.toml` omits `_jax_backend.py` and `_cupy_tagging.py` and excludes `if backend == "gpu":` blocks. Name a GPU dispatch branch exactly that way so it stays excluded. CPU coverage is 100%; keep it there.

@@ -110,7 +110,6 @@ def test_signatures_from_hessian_jax_shape():
 
 def test_signatures_from_hessian_jax_matches_cpu():
     from pycosmommf._jax_backend import (
-        fast_hessian_from_smoothed_jax,
         signatures_from_hessian_jax,
     )
 
@@ -211,4 +210,4 @@ def test_jax_backend_nexus_allows_negative_input():
     """NEXUS path does not log-transform, so negative input must work."""
     delta = _field / np.mean(_field) - 1.0
     sigs = m.maximum_signature(_Rs, delta, algorithm="NEXUS", backend="gpu")
-    assert sigs.shape == delta.shape + (3,)
+    assert sigs.shape == (*delta.shape, 3)

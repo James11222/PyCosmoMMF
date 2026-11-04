@@ -140,7 +140,7 @@ def _full_sum(kernel, *args):
     return np.float32(partials.sum().get())
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _masked_mass_above_kernel():
     """float32 sum of ``rho`` over voxels with ``valid & (sig > thresh)``."""
     cp = _cp()
@@ -156,7 +156,7 @@ def _masked_mass_above_kernel():
     )
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _masked_mass_kernel():
     """float32 sum of ``rho`` over voxels where ``mask`` is set."""
     cp = _cp()
@@ -172,7 +172,7 @@ def _masked_mass_kernel():
     )
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _clump_sums_kernel():
     """Atomically add each voxel's δ (float32) and a count (int32) to its clump."""
     cp = _cp()
@@ -184,7 +184,7 @@ def _clump_sums_kernel():
     )
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _structure_filter_kernel():
     """uint8 structure type per voxel from the (mutually exclusive) cluster, filament and wall masks."""
     cp = _cp()

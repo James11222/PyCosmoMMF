@@ -88,7 +88,7 @@ def test_maximum_signature_nexus_allows_negative_input():
     Rs = [np.sqrt(2) ** n for n in range(3)]
     delta = test_field / np.mean(test_field) - 1.0
     sigs = m.maximum_signature(Rs, delta, algorithm="NEXUS", backend="cpu")
-    assert sigs.shape == delta.shape + (3,)
+    assert sigs.shape == (*delta.shape, 3)
 
 
 @pytest.mark.parametrize("backend", ["jax", "cupy"])

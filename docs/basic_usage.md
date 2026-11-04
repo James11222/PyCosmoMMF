@@ -13,16 +13,16 @@ to analyze the effects of baryonic matter on the Cosmic Web.
 The NEXUS+ algorithm contains several steps as described in our paper
 ([Sunseri et al. 2022](https://ui.adsabs.harvard.edu/abs/2023PhRvD.107b3514S/abstract)).
 In general, we start with a density field (note: we more specifically mean a 1 +
-δ field), smooth it with a logarithmic Gaussian smoothing filter, then compute
-the hessian of the smoothed density field, use the eigenvalues of the hessian
-matrix to calculate the structure type signatures, find the maximum signatures
-over a range of smoothing scales, and apply physically based threshold criterion
-to categorize structures within the Cosmic Web. The entire package is
-implemented in `python` and all of these steps are summarized inside of two
-functions. The first function `maximum_signature()` does the first several steps
-of the NEXUS+ algorithm to compute the maximum structure signatures, the second
-function is `calc_structure_bools()` which uses physical criteria to tag
-structures into 4 categories: clusters, filaments, walls, and voids.
+δ field), smooth it with a log-Gaussian smoothing filter, then compute the
+hessian of the smoothed density field, use the eigenvalues of the hessian matrix
+to calculate the structure type signatures, find the maximum signatures over a
+range of smoothing scales, and apply physically based threshold criterion to
+categorize structures within the Cosmic Web. The entire package is implemented
+in `python` and all of these steps are summarized inside of two functions. The
+first function `maximum_signature()` does the first several steps of the NEXUS+
+algorithm to compute the maximum structure signatures, the second function is
+`calc_structure_bools()` which uses physical criteria to tag structures into 4
+categories: clusters, filaments, walls, and voids.
 
 We also make the data products from our paper
 ([Sunseri et al. 2022](https://ui.adsabs.harvard.edu/abs/2023PhRvD.107b3514S/abstract))
@@ -98,9 +98,9 @@ structure_filter = PyCosmoMMF.calc_structure_bools(
 ```
 
 `structure_filter` is a `uint8` array with the same shape as the density field
-that gives the structure type of every voxel: `1` = cluster, `2` = filament,
-`3` = wall and `4` = void. Every voxel has exactly one type. Boolean filters for
-a single structure type are one comparison away:
+that gives the structure type of every voxel: `1` = cluster, `2` = filament, `3`
+= wall and `4` = void. Every voxel has exactly one type. Boolean filters for a
+single structure type are one comparison away:
 
 ```python
 clusbool = structure_filter == 1
@@ -141,8 +141,7 @@ average overdensity greater than this value, they are thought to be
 virialized/collapsed.
 
 The structure filter produced by `calc_structure_bools()` can be used to tag
-structures within a density field, the results of this can be
-seen below
+structures within a density field, the results of this can be seen below
 
 ```{image} images/final_tagging_figure.png
 :class: only-light
@@ -152,6 +151,45 @@ seen below
 :align: center
 :class: only-dark
 ```
+
+#### Running on a GPU
+
+Both `maximum_signature()` and `calc_structure_bools()` take a `backend`
+argument. The default, `backend="cpu"`, uses NumPy, SciPy, Numba and
+scikit-image. `backend="gpu"` computes the signatures with JAX and tags the
+structures with CuPy. It needs a CUDA GPU and the `gpu` extra:
+
+```bash
+pip install 'pycosmommf[gpu]'
+```
+
+To keep the signatures on the GPU between the two steps, pass
+`return_numpy=False` to `maximum_signature()`. It then returns a JAX array, and
+`calc_structure_bools()` reads that array without copying it. The returned
+`structure_filter` is always a NumPy array.
+
+```python
+import os
+
+# set these before JAX is imported; they are needed for large grids
+os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
+os.environ["XLA_PYTHON_CLIENT_ALLOCATOR"] = "cuda_async"
+
+import PyCosmoMMF
+
+max_signatures = PyCosmoMMF.maximum_signature(
+    Rs, density_field, algorithm="NEXUSPLUS", backend="gpu", return_numpy=False
+)
+structure_filter = PyCosmoMMF.calc_structure_bools(
+    density_field, max_signatures, verbose_flag, backend="gpu"
+)
+```
+
+The GPU backend runs on one GPU. The GPU signatures need about 9–10× the memory
+of one float32 density field, and the GPU tagging needs about 7×. A 1024³ grid,
+the largest grid PyCosmoMMF supports, needs about 65 GiB, so it needs a GPU with
+80 GB of memory. A 40 GB GPU is not enough at 1024³. The CPU and GPU backends
+agree to float32 precision and give the same structure tagging.
 
 #### Additional Code Information
 

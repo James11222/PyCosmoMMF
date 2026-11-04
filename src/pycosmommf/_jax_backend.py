@@ -443,7 +443,8 @@ def _choose_n_tiles(nx, ny, nz):
     The signature stage produces a handful of (tile_nx, ny, nz) f32 temporaries
     in addition to the (tile_nx, ny, nz, 3) signature tile. With 8 tiles each
     temp is ~1/8 of a field; that has been comfortable on a 32 GiB V100 at
-    N=512 and on a 40 GiB A100 at N=1024. Smaller grids don't need tiling.
+    N=512. At N=1024 the whole per-scale step still needs ~65 GiB, so it
+    requires an 80 GB GPU. Smaller grids don't need tiling.
     """
     # No need to tile small grids — overhead outweighs the savings.
     if nx * ny * nz <= 128**3:
@@ -455,7 +456,7 @@ def _choose_n_tiles(nx, ny, nz):
     return 1
 
 
-def _make_scale_step(nx, ny, nz, kv_jax, algorithm, n_tiles):
+def _make_scale_step(nx, kv_jax, algorithm, n_tiles):
     """
     Build a single JIT-compiled function that, given the running ``sigmax``
     buffer and the (already-on-device) ``field``, performs one smoothing
@@ -475,7 +476,6 @@ def _make_scale_step(nx, ny, nz, kv_jax, algorithm, n_tiles):
     count.
     """
     jax = _jax()
-    jnp = _jnp()
 
     kx, ky, kz = kv_jax
     KX = kx[:, None, None]
@@ -486,16 +486,12 @@ def _make_scale_step(nx, ny, nz, kv_jax, algorithm, n_tiles):
 
     def step_impl(sigmax, field, R):
         f_Rn = smooth(field, R, (kx, ky, kz))
-        h_xx, h_xy, h_xz, h_yy, h_yz, h_zz = _hessian_components(
-            f_Rn, R, KX, KY, KZ
-        )
+        h_xx, h_xy, h_xz, h_yy, h_yz, h_zz = _hessian_components(f_Rn, R, KX, KY, KZ)
         # f_Rn is now dead in the JAX graph; XLA can free its buffer
         # before the signature stage runs.
 
         if n_tiles == 1:
-            return _signature_tile_update(
-                sigmax, h_xx, h_xy, h_xz, h_yy, h_yz, h_zz
-            )
+            return _signature_tile_update(sigmax, h_xx, h_xy, h_xz, h_yy, h_yz, h_zz)
 
         # Python-side tile loop, unrolled at trace time. Each iteration
         # produces an updated slab; XLA sees the full graph and (with
@@ -573,7 +569,7 @@ def maximum_signature_jax(
         sigmax = jnp.full((nx, ny, nz, 3), eps, dtype=jnp.float32)
 
         n_tiles = _choose_n_tiles(nx, ny, nz)
-        step = _make_scale_step(nx, ny, nz, kv_jax, algorithm, n_tiles)
+        step = _make_scale_step(nx, kv_jax, algorithm, n_tiles)
 
         for R in Rs:
             sigmax = step(sigmax, field, float(R))
